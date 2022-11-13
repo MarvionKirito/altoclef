@@ -71,7 +71,7 @@ public class MarvionBeatMinecraftTask extends Task {
     };
     private static final ItemTarget[] COLLECT_STONE_GEAR = combine(
             toItemTargets(Items.STONE_SWORD, 1),
-            toItemTargets(Items.STONE_PICKAXE, 2));
+            toItemTargets(Items.STONE_PICKAXE, 1));
     private static final Item COLLECT_SHIELD = Items.SHIELD;
     private static final Item[] COLLECT_IRON_ARMOR = ItemHelper.IRON_ARMORS;
     private static final Item[] COLLECT_EYE_ARMOR_END = ItemHelper.DIAMOND_ARMORS;
@@ -97,7 +97,8 @@ public class MarvionBeatMinecraftTask extends Task {
             toItemTargets(Items.STONE_SHOVEL, 1),
             toItemTargets(Items.STONE_AXE, 1),
             toItemTargets(Items.STONE_HOE, 1),
-            toItemTargets(Items.SHIELD, 1)
+            toItemTargets(Items.SHIELD, 1),
+            toItemTargets(Items.FLINT_AND_STEEL, 1)
     );
     private static final ItemTarget[] IRON_GEAR_MIN = combine(
             toItemTargets(Items.IRON_SWORD, 1),
