@@ -92,11 +92,16 @@ public class MarvionBeatMinecraftTask extends Task {
             toItemTargets(Items.DIAMOND_PICKAXE, 3)
     );
     private static final ItemTarget[] IRON_GEAR = combine(
-            toItemTargets(Items.IRON_SWORD, 2),
-            toItemTargets(Items.IRON_PICKAXE, 3)
+            toItemTargets(Items.IRON_SWORD, 1),
+            toItemTargets(Items.DIAMOND_PICKAXE, 1),
+            toItemTargets(Items.STONE_SHOVEL, 1),
+            toItemTargets(Items.STONE_AXE, 1),
+            toItemTargets(Items.STONE_HOE, 1),
+            toItemTargets(Items.SHIELD, 1)
     );
     private static final ItemTarget[] IRON_GEAR_MIN = combine(
-            toItemTargets(Items.IRON_SWORD, 2)
+            toItemTargets(Items.IRON_SWORD, 1),
+            toItemTargets(Items.DIAMOND_PICKAXE, 1)
     );
     private static final int END_PORTAL_FRAME_COUNT = 12;
     private static final double END_PORTAL_BED_SPAWN_RANGE = 8;
@@ -149,7 +154,6 @@ public class MarvionBeatMinecraftTask extends Task {
     private boolean isGettingBlazeRods = false;
     private boolean isGettingEnderPearls = false;
     private Task searchBiomeTask;
-    private Task _getPorkchopTask;
     private Task _stoneGearTask;
     private Task _logsTask;
     private Task _starterGearTask;
@@ -584,7 +588,7 @@ public class MarvionBeatMinecraftTask extends Task {
         }
         if (WorldHelper.getCurrentDimension() == Dimension.OVERWORLD && _foodTask == null && !_getOneBedTask.isActive()
                 && !_locateStrongholdTask.isActive() && _logsTask == null && _stoneGearTask == null &&
-                _getPorkchopTask == null && searchBiomeTask == null && _config.renderDistanceManipulation &&
+        searchBiomeTask == null && _config.renderDistanceManipulation &&
                 !_ranStrongholdLocator && getBedTask == null && !_sleepThroughNightTask.isActive()) {
             if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                 timer1++;
@@ -1335,18 +1339,6 @@ public class MarvionBeatMinecraftTask extends Task {
                 } else {
                     _stoneGearTask = null;
                 }
-                if (shouldForce(mod, _getPorkchopTask)) {
-                    setDebugState("Getting porkchop just for fun.");
-                    if (_config.renderDistanceManipulation) {
-                        if (!mod.getClientBaritone().getExploreProcess().isActive()) {
-                            MinecraftClient.getInstance().options.getViewDistance().setValue(32);
-                            MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
-                        }
-                    }
-                    return _getPorkchopTask;
-                } else {
-                    _getPorkchopTask = null;
-                }
                 if (shouldForce(mod, _starterGearTask)) {
                     setDebugState("Getting starter gear.");
                     return _starterGearTask;
@@ -1418,9 +1410,7 @@ public class MarvionBeatMinecraftTask extends Task {
                 boolean ironGearSatisfied = StorageHelper.itemTargetsMet(mod, COLLECT_IRON_GEAR_MIN) && StorageHelper.isArmorEquippedAll(mod, COLLECT_IRON_ARMOR);
                 boolean shieldSatisfied = StorageHelper.isArmorEquipped(mod, COLLECT_SHIELD);
                 // Search for a better place
-                if (!mod.getItemStorage().hasItem(Items.PORKCHOP) &&
-                        !mod.getItemStorage().hasItem(Items.COOKED_PORKCHOP) &&
-                        !StorageHelper.itemTargetsMet(mod, IRON_GEAR_MIN) && !ironGearSatisfied && !eyeGearSatisfied) {
+                if (!StorageHelper.itemTargetsMet(mod, IRON_GEAR_MIN) && !ironGearSatisfied && !eyeGearSatisfied) {
                     if (mod.getItemStorage().getItemCount(ItemHelper.LOG) < 12 && !StorageHelper.itemTargetsMet(mod, COLLECT_STONE_GEAR) &&
                             !StorageHelper.itemTargetsMet(mod, IRON_GEAR_MIN) && !eyeGearSatisfied &&
                             !ironGearSatisfied) {
@@ -1441,28 +1431,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     } else {
                         _stoneGearTask = null;
                     }
-                    if (mod.getEntityTracker().entityFound(PigEntity.class) && (StorageHelper.itemTargetsMet(mod,
-                            COLLECT_STONE_GEAR) || StorageHelper.itemTargetsMet(mod, IRON_GEAR_MIN) ||
-                            eyeGearSatisfied || ironGearSatisfied)) {
-                        _getPorkchopTask = new KillAndLootTask(PigEntity.class, new
-                                ItemTarget(Items.PORKCHOP, 1));
-                        return _getPorkchopTask;
-                    } else {
-                        _getPorkchopTask = null;
-                    }
-                    setDebugState("Searching a better place to start with.");
-                    if (_config.renderDistanceManipulation) {
-                        if (!mod.getClientBaritone().getExploreProcess().isActive()) {
-                            timer1++;
-                            if (timer1 >= 500) {
-                                MinecraftClient.getInstance().options.getViewDistance().setValue(32);
-                                MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
-                                timer1 = 0;
-                            }
-                        }
-                    }
-                    searchBiomeTask = new SearchWithinBiomeTask(BiomeKeys.PLAINS);
-                    return searchBiomeTask;
+                    searchBiomeTask = null;
                 } else {
                     searchBiomeTask = null;
                 }
