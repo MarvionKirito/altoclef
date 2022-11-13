@@ -1165,10 +1165,6 @@ public class MarvionBeatMinecraftTask extends Task {
 
     private Task getEnderPearlTask(AltoClef mod, int count) {
         isGettingEnderPearls = true;
-        if (shouldForce(mod, getTwistingVines)) {
-            setDebugState("Getting twisting vines for MLG purposes.");
-            return getTwistingVines;
-        }
         if (mod.getEntityTracker().itemDropped(Items.ENDER_PEARL)) {
             return new PickupDroppedItemTask(Items.ENDER_PEARL, 1);
         }
@@ -1180,8 +1176,7 @@ public class MarvionBeatMinecraftTask extends Task {
             return new TradeWithPiglinsTask(32, Items.ENDER_PEARL, count);
         } else {
             if ((mod.getEntityTracker().entityFound(EndermanEntity.class) ||
-                    mod.getEntityTracker().itemDropped(Items.ENDER_PEARL)) &&
-                    mod.getItemStorage().getItemCount(Items.TWISTING_VINES) > 14) {
+                    mod.getEntityTracker().itemDropped(Items.ENDER_PEARL))) {
                 Optional<Entity> toKill = mod.getEntityTracker().getClosestEntity(EndermanEntity.class);
                 if (toKill.isPresent()) {
                     if (mod.getEntityTracker().isEntityReachable(toKill.get())) {
@@ -1189,13 +1184,9 @@ public class MarvionBeatMinecraftTask extends Task {
                     }
                 }
             }
-            if (mod.getItemStorage().getItemCount(Items.TWISTING_VINES) < 14) {
-                getTwistingVines = TaskCatalogue.getItemTask(Items.TWISTING_VINES, 28);
-                return getTwistingVines;
-            }
             // Search for warped forests this way...
             setDebugState("Searching Warped Forest");
-            return new SearchWithinBiomeTask(BiomeKeys.WARPED_FOREST);
+            return new SearchChunkForBlockTask(Blocks.WARPED_NYLIUM);
         }
     }
 
