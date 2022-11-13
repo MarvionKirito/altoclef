@@ -92,7 +92,11 @@ public class LocateStrongholdCoordinatesTask extends Task {
             } else if (_cachedEyeDirection != null) {
                 _cachedEyeDirection.updateEyePos(_currentThrownEye.getPos());
             }
-
+            if (mod.getEntityTracker().getClosestEntity(EyeOfEnderEntity.class).isPresent() &&
+                    !mod.getClientBaritone().getPathingBehavior().isPathing()) {
+                LookHelper.lookAt(mod,
+                        mod.getEntityTracker().getClosestEntity(EyeOfEnderEntity.class).get().getEyePos());
+            }
             setDebugState("Waiting for eye to travel.");
             return null;
         }
