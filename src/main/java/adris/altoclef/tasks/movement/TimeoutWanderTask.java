@@ -205,7 +205,7 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
             case END -> {
                 if (_timer.getDuration() >= 30) {
                     if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                        MinecraftClient.getInstance().options.getViewDistance().setValue(12);
+                        MinecraftClient.getInstance().options.getSimulationDistance().setValue(12);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
                     _timer.reset();
@@ -214,13 +214,13 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
             case OVERWORLD, NETHER -> {
                 if (_timer.getDuration() >= 30) {
                     if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                        MinecraftClient.getInstance().options.getViewDistance().setValue(12);
+                        MinecraftClient.getInstance().options.getSimulationDistance().setValue(12);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
                 }
                 if (_timer.elapsed()) {
                     if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                        MinecraftClient.getInstance().options.getViewDistance().setValue(32);
+                        MinecraftClient.getInstance().options.getSimulationDistance().setValue(32);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
                     }
                     _timer.reset();

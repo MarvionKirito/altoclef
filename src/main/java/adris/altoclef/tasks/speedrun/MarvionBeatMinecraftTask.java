@@ -562,7 +562,7 @@ public class MarvionBeatMinecraftTask extends Task {
                 if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                     if (_timer1.elapsed()) {
                         if (_config.renderDistanceManipulation) {
-                            getInstance().options.getViewDistance().setValue(12);
+                            getInstance().options.getSimulationDistance().setValue(12);
                         }
                         _timer1.reset();
                     }
@@ -575,13 +575,13 @@ public class MarvionBeatMinecraftTask extends Task {
             if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                 if (_timer3.getDuration() >= 30) {
                     if (_config.renderDistanceManipulation) {
-                        getInstance().options.getViewDistance().setValue(12);
+                        getInstance().options.getSimulationDistance().setValue(12);
                         getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
                 }
                 if (_timer3.elapsed()) {
                     if (_config.renderDistanceManipulation) {
-                        getInstance().options.getViewDistance().setValue(32);
+                        getInstance().options.getSimulationDistance().setValue(32);
                         getInstance().options.getEntityDistanceScaling().setValue(5.0);
                     }
                     _timer3.reset();
@@ -595,7 +595,7 @@ public class MarvionBeatMinecraftTask extends Task {
             if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                 if (_timer1.elapsed()) {
                     if (_config.renderDistanceManipulation) {
-                        getInstance().options.getViewDistance().setValue(2);
+                        getInstance().options.getSimulationDistance().setValue(5);
                         getInstance().options.getEntityDistanceScaling().setValue(0.5);
                     }
                     _timer1.reset();
@@ -607,7 +607,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     _config.renderDistanceManipulation) {
                 if (_timer1.elapsed()) {
                     if (_config.renderDistanceManipulation) {
-                        getInstance().options.getViewDistance().setValue(12);
+                        getInstance().options.getSimulationDistance().setValue(12);
                         getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
                     _timer1.reset();
@@ -775,7 +775,7 @@ public class MarvionBeatMinecraftTask extends Task {
         // End stuff.
         if (WorldHelper.getCurrentDimension() == Dimension.END) {
             if (_config.renderDistanceManipulation) {
-                getInstance().options.getViewDistance().setValue(12);
+                getInstance().options.getSimulationDistance().setValue(12);
                 getInstance().options.getEntityDistanceScaling().setValue(1.0);
             }
             // If we have bed, do bed strats, otherwise punk normally.
@@ -918,7 +918,7 @@ public class MarvionBeatMinecraftTask extends Task {
                 if (_config.renderDistanceManipulation && mod.getItemStorage().hasItem(ItemHelper.BED)) {
                     if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                         if (_timer1.elapsed()) {
-                            getInstance().options.getViewDistance().setValue(2);
+                            getInstance().options.getSimulationDistance().setValue(5);
                             getInstance().options.getEntityDistanceScaling().setValue(0.5);
                             _timer1.reset();
                         }
@@ -954,7 +954,7 @@ public class MarvionBeatMinecraftTask extends Task {
                 if (_config.renderDistanceManipulation) {
                     if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                         if (_timer1.elapsed()) {
-                            getInstance().options.getViewDistance().setValue(2);
+                            getInstance().options.getSimulationDistance().setValue(5);
                             getInstance().options.getEntityDistanceScaling().setValue(0.5);
                             _timer1.reset();
                         }
@@ -1069,7 +1069,7 @@ public class MarvionBeatMinecraftTask extends Task {
                         if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                             if (_timer1.elapsed()) {
                                 if (_config.renderDistanceManipulation) {
-                                    getInstance().options.getViewDistance().setValue(32);
+                                    getInstance().options.getSimulationDistance().setValue(32);
                                     getInstance().options.getEntityDistanceScaling().setValue(5.0);
                                 }
                                 _timer1.reset();
@@ -1323,7 +1323,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     if (_config.renderDistanceManipulation) {
                         if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                             if (_timer1.elapsed()) {
-                                MinecraftClient.getInstance().options.getViewDistance().setValue(2);
+                                MinecraftClient.getInstance().options.getSimulationDistance().setValue(5);
                                 MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(0.5);
                                 _timer1.reset();
                             }
@@ -1350,7 +1350,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     setDebugState("Getting porkchop just for fun.");
                     if (_config.renderDistanceManipulation) {
                         if (!mod.getClientBaritone().getExploreProcess().isActive()) {
-                            MinecraftClient.getInstance().options.getViewDistance().setValue(32);
+                            MinecraftClient.getInstance().options.getSimulationDistance().setValue(32);
                             MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
                         }
                     }
@@ -1374,7 +1374,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     if (_config.renderDistanceManipulation) {
                         if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                             if (_timer1.elapsed()) {
-                                MinecraftClient.getInstance().options.getViewDistance().setValue(2);
+                                MinecraftClient.getInstance().options.getSimulationDistance().setValue(5);
                                 MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(0.5);
                                 _timer1.reset();
                             }
@@ -1464,7 +1464,7 @@ public class MarvionBeatMinecraftTask extends Task {
                     if (_config.renderDistanceManipulation) {
                         if (!mod.getClientBaritone().getExploreProcess().isActive()) {
                             if (_timer1.elapsed()) {
-                                MinecraftClient.getInstance().options.getViewDistance().setValue(32);
+                                MinecraftClient.getInstance().options.getSimulationDistance().setValue(32);
                                 MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
                                 _timer1.reset();
                             }

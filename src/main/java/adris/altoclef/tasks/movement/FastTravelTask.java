@@ -119,7 +119,7 @@ public class FastTravelTask extends Task {
                 if (_goToOverworldTask.isActive() && !_goToOverworldTask.isFinished(mod)) {
                     setDebugState("Going back to overworld");
                     if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                        MinecraftClient.getInstance().options.getViewDistance().setValue(32);
+                        MinecraftClient.getInstance().options.getSimulationDistance().setValue(32);
                     }
                     return _goToOverworldTask;
                 }

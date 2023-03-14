@@ -102,7 +102,7 @@ public class CollectMeatTask extends Task {
         if (_smeltTask != null && _smeltTask.isActive() && !_smeltTask.isFinished(mod)) {
             setDebugState("Cooking...");
             if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                MinecraftClient.getInstance().options.getViewDistance().setValue(2);
+                MinecraftClient.getInstance().options.getSimulationDistance().setValue(5);
                 MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(0.5);
             }
             return _smeltTask;

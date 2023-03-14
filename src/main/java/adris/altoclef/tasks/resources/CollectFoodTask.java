@@ -167,7 +167,7 @@ public class CollectFoodTask extends Task {
             // TODO: If we don't have cooking materials, cancel.
             setDebugState("Cooking...");
             if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
-                MinecraftClient.getInstance().options.getViewDistance().setValue(2);
+                MinecraftClient.getInstance().options.getSimulationDistance().setValue(5);
                 MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(0.5);
             }
             return _smeltTask;
