@@ -27,6 +27,7 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
   along the way.
 - Become the terminator: Run away from players while unarmed, gather diamond gear in secret, then return and wreak
   havoc.
+- Make your own Tasks with the [TaskCreator](https://github.com/gaucho-matrero/Altoclef-TaskCreator)
 
 ## Download
 
@@ -45,5 +46,3 @@ is untested and not affiliated with altoclef, use at your own risk!)
 ## [Usage Guide](usage.md)
 
 ## [TODO's/Future Features](todos.md)
-
-## [Development Guide](develop.md)
