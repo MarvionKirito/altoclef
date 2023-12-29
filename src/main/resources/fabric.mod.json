@@ -17,11 +17,14 @@
   "icon": "assets/altoclef/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "client": [
       "adris.altoclef.AltoClef"
     ]
   },
   "mixins": [
     "altoclef.mixins.json"
-  ]
+  ],
+  "depends": {
+    "fabric-key-binding-api-v1": "*"
+  }
 }

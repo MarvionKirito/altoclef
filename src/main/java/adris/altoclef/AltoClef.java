@@ -24,6 +24,7 @@ import baritone.Baritone;
 import baritone.altoclef.AltoClefSettings;
 import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -44,7 +45,7 @@ import java.util.function.Consumer;
 /**
  * Central access point for AltoClef
  */
-public class AltoClef implements ModInitializer {
+public class AltoClef implements ClientModInitializer {
 
     // Static access to altoclef
     private static final Queue<Consumer<AltoClef>> _postInitQueue = new ArrayDeque<>();
@@ -78,6 +79,8 @@ public class AltoClef implements ModInitializer {
     // Butler
     private Butler _butler;
 
+    private KeyBindings keyBindings;
+
     // Are we in game (playing in a server/world)
     public static boolean inGame() {
         return MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().getNetworkHandler() != null;
@@ -91,7 +94,11 @@ public class AltoClef implements ModInitializer {
     }
 
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
+
+        keyBindings = new KeyBindings(this);
+        keyBindings.registerBindings();
+
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.
         // As such, nothing will be loaded here but basic initialization.
