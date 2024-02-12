@@ -3,7 +3,7 @@ package adris.altoclef.tasks.movement;
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
 import adris.altoclef.tasks.entity.KillEntitiesTask;
-import adris.altoclef.tasks.speedrun.MarvionBeatMinecraftTask;
+import adris.altoclef.tasks.speedrun.BeatMinecraft3Task;
 import adris.altoclef.tasksystem.ITaskRequiresGrounded;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.util.helpers.ItemHelper;
@@ -204,7 +204,7 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
         switch (WorldHelper.getCurrentDimension()) {
             case END -> {
                 if (_timer.getDuration() >= 30) {
-                    if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
+                    if (BeatMinecraft3Task.getConfig().renderDistanceManipulation) {
                         MinecraftClient.getInstance().options.getViewDistance().setValue(12);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
@@ -213,13 +213,13 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
             }
             case OVERWORLD, NETHER -> {
                 if (_timer.getDuration() >= 30) {
-                    if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
+                    if (BeatMinecraft3Task.getConfig().renderDistanceManipulation) {
                         MinecraftClient.getInstance().options.getViewDistance().setValue(12);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(1.0);
                     }
                 }
                 if (_timer.elapsed()) {
-                    if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
+                    if (BeatMinecraft3Task.getConfig().renderDistanceManipulation) {
                         MinecraftClient.getInstance().options.getViewDistance().setValue(32);
                         MinecraftClient.getInstance().options.getEntityDistanceScaling().setValue(5.0);
                     }

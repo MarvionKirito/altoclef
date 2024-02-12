@@ -30,7 +30,7 @@ public class AltoClefCommands {
                 new MeatCommand(),
                 new ReloadSettingsCommand(),
                 new GamerCommand(),
-                new MarvionCommand(),
+                new Gamer2Command(),
                 new PunkCommand(),
                 new HeroCommand(),
                 new SetGammaCommand(),

@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 import static net.minecraft.client.MinecraftClient.getInstance;
 
 @SuppressWarnings("ALL")
-public class MarvionBeatMinecraftTask extends Task {
+public class BeatMinecraft3Task extends Task {
     private static final Block[] TRACK_BLOCKS = new Block[]{
             Blocks.BLAST_FURNACE,
             Blocks.FURNACE,
@@ -175,7 +175,7 @@ public class MarvionBeatMinecraftTask extends Task {
     private Task getBedTask;
     private Task getTwistingVines;
 
-    public MarvionBeatMinecraftTask() {
+    public BeatMinecraft3Task() {
         _locateStrongholdTask = new GoToStrongholdPortalTask(_config.targetEyes);
         _buildMaterialsTask = new GetBuildingMaterialsTask(_config.buildMaterialCount);
     }
@@ -610,18 +610,18 @@ public class MarvionBeatMinecraftTask extends Task {
     }
 
     /**
-     * Check if the given task is equal to this MarvionBeatMinecraftTask.
+     * Check if the given task is equal to this BeatMinecraft3Task.
      *
      * @param other The task to compare.
      * @return True if the tasks are equal, false otherwise.
      */
     @Override
     protected boolean isEqual(Task other) {
-        // Check if the given task is of type MarvionBeatMinecraftTask
-        boolean isSameTask = other != null && other instanceof MarvionBeatMinecraftTask;
+        // Check if the given task is of type BeatMinecraft3Task
+        boolean isSameTask = other != null && other instanceof BeatMinecraft3Task;
         if (!isSameTask) {
-            // Log a message if the given task is not of type MarvionBeatMinecraftTask
-            Debug.logInternal("The 'other' task is not of type MarvionBeatMinecraftTask");
+            // Log a message if the given task is not of type BeatMinecraft3Task
+            Debug.logInternal("The 'other' task is not of type BeatMinecraft3Task");
         }
         return isSameTask;
     }
@@ -633,7 +633,7 @@ public class MarvionBeatMinecraftTask extends Task {
      */
     @Override
     protected String toDebugString() {
-        return "Beating the game (Marvion version).";
+        return "Beating the game (modern version).";
     }
 
     /**
