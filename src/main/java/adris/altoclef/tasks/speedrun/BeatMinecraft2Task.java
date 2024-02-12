@@ -49,6 +49,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings("ALL")
+@Deprecated
 public class BeatMinecraft2Task extends Task {
 
     private static final Block[] TRACK_BLOCKS = new Block[]{

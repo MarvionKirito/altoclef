@@ -3,7 +3,7 @@ package adris.altoclef.tasks.movement;
 import adris.altoclef.AltoClef;
 import adris.altoclef.TaskCatalogue;
 import adris.altoclef.tasks.construction.compound.ConstructNetherPortalObsidianTask;
-import adris.altoclef.tasks.speedrun.MarvionBeatMinecraftTask;
+import adris.altoclef.tasks.speedrun.BeatMinecraft3Task;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.util.Dimension;
 import adris.altoclef.util.ItemTarget;
@@ -118,7 +118,7 @@ public class FastTravelTask extends Task {
                 // If we're going to the overworld, keep going.
                 if (_goToOverworldTask.isActive() && !_goToOverworldTask.isFinished(mod)) {
                     setDebugState("Going back to overworld");
-                    if (MarvionBeatMinecraftTask.getConfig().renderDistanceManipulation) {
+                    if (BeatMinecraft3Task.getConfig().renderDistanceManipulation) {
                         MinecraftClient.getInstance().options.getViewDistance().setValue(32);
                     }
                     return _goToOverworldTask;
