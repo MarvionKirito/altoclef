@@ -34,6 +34,11 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
 [YouTube Tutorials](https://youtu.be/1rlzjRCZVTw?si=txCAZ7GGiDg55nkz)
 
 
+##Other nice [Forks](https://github.com/MarvionKirito/altoclef/forks?include=active&page=1&period=&sort_by=stargazer_counts)
+##Ideas
+If you want to help very much, you can try to implement [this](https://github.com/MiranCZ/Tungsten).
+
+
 ### Versions
 
 This is a **fabric only** mod, currently only available for **Minecraft 1.18.2-1.20.5**.
