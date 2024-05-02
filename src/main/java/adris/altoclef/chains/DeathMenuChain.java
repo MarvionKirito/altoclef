@@ -8,7 +8,11 @@ import adris.altoclef.tasksystem.TaskRunner;
 import adris.altoclef.util.time.TimerGame;
 import adris.altoclef.util.time.TimerReal;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
@@ -89,12 +93,10 @@ public class DeathMenuChain extends TaskChain {
                         String command = i.replace("{deathmessage}", deathMessage);
                         String prefix = mod.getModSettings().getCommandPrefix();
                         while (MinecraftClient.getInstance().player.isAlive()) ;
-                        if (command != "") {
+                        if (!command.isEmpty()) {
                             if (command.startsWith(prefix)) {
                                 AltoClef.getCommandExecutor().execute(command, () -> {
-                                }, e -> {
-                                    e.printStackTrace();
-                                });
+                                }, Throwable::printStackTrace);
                             } else if (command.startsWith("/")) {
                                 MinecraftClient.getInstance().player.networkHandler.sendChatCommand(command.substring(1));
                             } else {
