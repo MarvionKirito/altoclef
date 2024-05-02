@@ -1,4 +1,4 @@
-# altoclef
+# AltoClef
 
 Plays block game.
 
@@ -21,53 +21,33 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
 - Obtain 400+ Items from a fresh survival world, like diamond armor, cake, and nether brick stairs
 - Dodge mob projectiles and force field mobs away while accomplishing arbitrary tasks
 - Collect + smelt food from animals, hay, & crops
-- Receive commands from chat whispers via /msg. Whitelist + Blacklist configurable (hereby dubbed the Butler System).
-  Here's
-  a [Butler system demo video](https://drive.google.com/file/d/1axVYYMJ5VjmVHaWlCifFHTwiXlFssOUc/view?usp=sharing)
 - Simple config file that can be reloaded via command (check .minecraft directory)
 - Beat the entire game on its own (no user input.)
 - Print the entire bee movie script with signs in a straight line, automatically collecting signs + bridging materials
   along the way.
 - Become the terminator: Run away from players while unarmed, gather diamond gear in secret, then return and wreak
   havoc.
+- Make your own Tasks with the [TaskCreator](https://github.com/gaucho-matrero/Altoclef-TaskCreator)
 
 ## Download
 
-**Note:** After installing, please move/delete your old baritone configurations if you have any. Preexisting baritone
-configurations will interfere with altoclef and introduce bugs. This will be fixed in the future.
+[YouTube Tutorials](https://youtu.be/1rlzjRCZVTw?si=txCAZ7GGiDg55nkz)
 
-### Nightly Release (Recommended) (has the latest bug fixes)
 
-Start by downloading [the Latest Long Term Release](https://github.com/gaucho-matrero/altoclef/releases),
-then [Download the Nightly](https://nightly.link/gaucho-matrero/altoclef/workflows/gradle/main/Artifacts.zip) &
-replace `altoclef-4.0-SNAPSHOT.jar`.
+##Other nice [Forks](https://github.com/MarvionKirito/altoclef/forks?include=active&page=1&period=&sort_by=stargazer_counts)
+##Ideas
+If you want to help very much, you can try to implement [this](https://github.com/MiranCZ/Tungsten).
 
-If the Nightly Link doesn't work, check the latest [Build Action](https://github.com/gaucho-matrero/altoclef/actions)
-that succeeded and download `Artifacts.zip` (you must be signed into GitHub). Replace your
-existing `altoclef-4.0-SNAPSHOT.jar` with the one found in `Artifacts.zip`
-
-### Long Term Release
-
-[Check releases](https://github.com/gaucho-matrero/altoclef/releases). Note you will need to copy over both jar files
-for the mod to work.
-
-### Meloweh's Extra Features Release (Unofficial)
-
-Has some schematic support, command macros and a few utility features. Will eventually be merged, but if you can try it
-out now if you'd like:
-
-- [AltoClef jar](https://github.com/Meloweh/altoclef/releases)
-- [Baritone jar](https://github.com/Meloweh/baritone/releases)
 
 ### Versions
 
-This is a **fabric only** mod, currently only available for **Minecraft 1.19.2-1.19.4**.
+This is a **fabric only** mod, currently only available for **Minecraft 1.18.2-1.20.5**.
 
-For older MC versions, try [multiconnect](https://www.curseforge.com/minecraft/mc-mods/multiconnect) (NOTE: multiconnect
+[Versions](https://squ1d.dev/altoclef-versions)
+
+For older MC versions, try [ViaFabricPlus](https://modrinth.com/mod/viafabricplus) (NOTE: ViaFabricPlus
 is untested and not affiliated with altoclef, use at your own risk!)
 
 ## [Usage Guide](usage.md)
 
 ## [TODO's/Future Features](todos.md)
-
-## [Development Guide](develop.md)
