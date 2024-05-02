@@ -36,11 +36,11 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
 
 ### Versions
 
-This is a **fabric only** mod, currently only available for **Minecraft 1.18.2-1.20.1**.
+This is a **fabric only** mod, currently only available for **Minecraft 1.18.2-1.20.5**.
 
 [Versions](https://squ1d.dev/altoclef-versions)
 
-For older MC versions, try [multiconnect](https://www.curseforge.com/minecraft/mc-mods/multiconnect) (NOTE: multiconnect
+For older MC versions, try [ViaFabricPlus](https://modrinth.com/mod/viafabricplus) (NOTE: ViaFabricPlus
 is untested and not affiliated with altoclef, use at your own risk!)
 
 ## [Usage Guide](usage.md)
