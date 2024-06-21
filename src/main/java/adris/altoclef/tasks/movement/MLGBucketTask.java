@@ -182,7 +182,7 @@ public class MLGBucketTask extends Task {
         }
 
         IPlayerContext ctx = mod.getClientBaritone().getPlayerContext();
-        Optional<Rotation> reachable = RotationUtils.reachableCenter(ctx.player(), toPlaceOn, ctx.playerController().getBlockReachDistance(), false);
+        Optional<Rotation> reachable = RotationUtils.reachableCenter(ctx, toPlaceOn, ctx.playerController().getBlockReachDistance(), false);
         if (reachable.isPresent()) {
             setDebugState("Performing MLG");
             LookHelper.lookAt(mod, reachable.get());
