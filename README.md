@@ -1,4 +1,4 @@
-# altoclef
+# Altoclef [Anarchy Edition]
 
 Plays block game.
 
@@ -8,8 +8,6 @@ A client side bot that can accomplish any Minecraft task that is relatively simp
 tasks. "Relatively Simple" is a vague term, so check the list of current capabilities to see examples.
 
 Became [the first bot to beat Minecraft fully autonomously](https://youtu.be/baAa6s8tahA) on May 24, 2021.
-
-**Join the [Discord Server](https://discord.gg/JdFP4Kqdqc)** for discussions/updates/goofs & gaffs
 
 ## How it works
 
@@ -30,44 +28,37 @@ or this [Video explanation](https://youtu.be/q5OmcinQ2ck?t=387)
   along the way.
 - Become the terminator: Run away from players while unarmed, gather diamond gear in secret, then return and wreak
   havoc.
+- Experimental Awareness System
 
 ## Download
+Check Releases
 
-**Note:** After installing, please move/delete your old baritone configurations if you have any. Preexisting baritone
-configurations will interfere with altoclef and introduce bugs. This will be fixed in the future.
+## Versions
 
-### Nightly Release (Recommended) (has the latest bug fixes)
+This is a **fabric only** mod, currently only available for **Minecraft 1.20.4**.
 
-Start by downloading [the Latest Long Term Release](https://github.com/gaucho-matrero/altoclef/releases),
-then [Download the Nightly](https://nightly.link/gaucho-matrero/altoclef/workflows/gradle/main/Artifacts.zip) &
-replace `altoclef-4.0-SNAPSHOT.jar`.
+You can Join Older Versions using these:
+- ViaFabric
+- ViaFabricPlus
+- MultiConnect
+- ViaProxy
 
-If the Nightly Link doesn't work, check the latest [Build Action](https://github.com/gaucho-matrero/altoclef/actions)
-that succeeded and download `Artifacts.zip` (you must be signed into GitHub). Replace your
-existing `altoclef-4.0-SNAPSHOT.jar` with the one found in `Artifacts.zip`
+## Goals for this Fork
+- Survive in the Anarchy Enviroment without any User Input
+- Dynamic Awareness System
+- Ability to Crystal PvP with Legit and Anarchy Modes
+- Server Version Based Task System
+- Discord Bot Support
+- WebPanel
+- Stat Logging
+- Seperate Mod dedicated to give Butler more features without using Wispers
+- Bot Syncing
+- Semi-Headless Mode
+- Full Elytra Support
+- Task Script System
+- Improved Water PathFinding
+- Improved Combat
+- Support for as many AntiCheats as possible
 
-### Long Term Release
-
-[Check releases](https://github.com/gaucho-matrero/altoclef/releases). Note you will need to copy over both jar files
-for the mod to work.
-
-### Meloweh's Extra Features Release (Unofficial)
-
-Has some schematic support, command macros and a few utility features. Will eventually be merged, but if you can try it
-out now if you'd like:
-
-- [AltoClef jar](https://github.com/Meloweh/altoclef/releases)
-- [Baritone jar](https://github.com/Meloweh/baritone/releases)
-
-### Versions
-
-This is a **fabric only** mod, currently only available for **Minecraft 1.19.2-1.19.4**.
-
-For older MC versions, try [multiconnect](https://www.curseforge.com/minecraft/mc-mods/multiconnect) (NOTE: multiconnect
-is untested and not affiliated with altoclef, use at your own risk!)
-
-## [Usage Guide](usage.md)
-
-## [TODO's/Future Features](todos.md)
-
-## [Development Guide](develop.md)
+## Are you looking for developers?
+We are always looking for developers get in contact in our discord and we can see if you fit the project
