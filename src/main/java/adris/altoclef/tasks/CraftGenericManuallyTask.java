@@ -127,7 +127,7 @@ public class CraftGenericManuallyTask extends Task {
             Optional<Slot> toFit = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
             if (toFit.isPresent()) {
                 mod.getSlotHandler().clickSlot(toFit.get(), 0, SlotActionType.PICKUP);
-            } else {
+            } else if(ItemHelper.canThrowAwayStack(mod, cursor)) {
                 // Eh screw it
                 mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, SlotActionType.PICKUP);
             }
