@@ -122,6 +122,9 @@ run/
 
 .classpath
 .project/
+.project
+.editorconfig
+q
 .settings/
 asd_client.launch
 asd_server.launch
