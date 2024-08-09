@@ -3,6 +3,7 @@ package adris.altoclef.tasks.stupid;
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
 import adris.altoclef.TaskCatalogue;
+import adris.altoclef.awareness.AwarenessSystem;
 import adris.altoclef.tasks.construction.PlaceBlockTask;
 import adris.altoclef.tasks.construction.PlaceStructureBlockTask;
 import adris.altoclef.tasks.container.SmeltInFurnaceTask;
@@ -38,7 +39,6 @@ import java.util.function.Predicate;
  * Roams around the world to terminate Sarah Khaannah
  */
 public class TerminatorTask extends Task {
-
     private static final int FEAR_SEE_DISTANCE = 30;
     private static final int FEAR_DISTANCE = 20;
     private static final int RUN_AWAY_DISTANCE = 80;
@@ -81,6 +81,41 @@ public class TerminatorTask extends Task {
 
     @Override
     protected Task onTick(AltoClef mod) {
+
+        if (_runAwayTask == null && isReadyToPunk(mod) && _closestPlayerLastPos != null) {
+            //AwarenessSystem
+            if (AwarenessSystem.getThreatLevel() >= 100) {
+                Debug.logMessage("TerminatorTask: Threat level is high, RunningAway.");
+                return _runAwayTask;
+            }
+            else if (mod.getPlayer().hurtTime == 1 && mod.getPlayer().getHealth() < 6) {
+                AwarenessSystem.addThreatLevel(10);
+            }
+            else if (_closestPlayerLastPos.distanceTo(mod.getPlayer().getPos()) > 25 && AwarenessSystem.getThreatLevel() < 50) {
+                Debug.logMessage("TerminatorTask: Threat Level is low, setting to 50.");
+                AwarenessSystem.setThreatLevel(50);
+            }
+            else if (_closestPlayerLastPos.distanceTo(mod.getPlayer().getPos()) < 25 && AwarenessSystem.getThreatLevel() < 75) {
+                Debug.logMessage("TerminatorTask: Threat Level is high, setting to 75.");
+                AwarenessSystem.setThreatLevel(75);
+            }
+            else if (mod.getPlayer().getHealth() > 6 && AwarenessSystem.getThreatLevel() >= 100) {
+                AwarenessSystem.setThreatLevel(0);
+                return new DoToClosestEntityTask(
+                        entity -> {
+                            if (entity instanceof PlayerEntity) {
+                                tryDoFunnyMessageTo(mod, (PlayerEntity) entity);
+                                return new KillPlayerTask(entity.getName().getString());
+                            }
+                            // Should never happen.
+                            Debug.logWarning("This should never happen.");
+                            return _scanTask;
+                        },
+                        interact -> shouldPunk(mod, (PlayerEntity) interact),
+                        PlayerEntity.class
+                );
+            }
+        }
 
         Optional<Entity> closest = mod.getEntityTracker().getClosestEntity(mod.getPlayer().getPos(), toPunk -> shouldPunk(mod, (PlayerEntity) toPunk), PlayerEntity.class);
 
@@ -147,11 +182,6 @@ public class TerminatorTask extends Task {
                 return PlaceBlockTask.getMaterialTask(PREFERRED_BUILDING_BLOCKS);
             }
 
-            // Get some food so we can last a little longer.
-            if ((mod.getPlayer().getHungerManager().getFoodLevel() < (20 - 3 * 2) || mod.getPlayer().getHealth() < 10) && StorageHelper.calculateInventoryFoodScore(mod) <= 0) {
-                return _foodTask;
-            }
-
             if (mod.getEntityTracker().getClosestEntity(mod.getPlayer().getPos(), toPunk -> shouldPunk(mod, (PlayerEntity) toPunk), PlayerEntity.class).isPresent()) {
                 setDebugState("Punking.");
                 return new DoToClosestEntityTask(
@@ -167,6 +197,12 @@ public class TerminatorTask extends Task {
                         interact -> shouldPunk(mod, (PlayerEntity) interact),
                         PlayerEntity.class
                 );
+            }
+            else {
+                // Get some food so we can last a little longer.
+                if ((mod.getPlayer().getHungerManager().getFoodLevel() < (20 - 3 * 2)) && StorageHelper.calculateInventoryFoodScore(mod) <= 0) {
+                    return _foodTask;
+                }
             }
         }
 
@@ -230,6 +266,7 @@ public class TerminatorTask extends Task {
     @Override
     protected void onStop(AltoClef mod, Task interruptTask) {
         mod.getBehaviour().pop();
+        AwarenessSystem.setThreatLevel(0);
     }
 
     @Override
