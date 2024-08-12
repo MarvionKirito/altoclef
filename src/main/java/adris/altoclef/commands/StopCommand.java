@@ -1,18 +1,23 @@
 package adris.altoclef.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
-import adris.altoclef.commandsystem.ArgParser;
 import adris.altoclef.commandsystem.Command;
+import net.minecraft.command.CommandSource;
 
 public class StopCommand extends Command {
 
-    public StopCommand() {
-        super("stop", "Stop task runner (stops all automation)");
+    public StopCommand(AltoClef mod) {
+        super("stop", "Stop task runner (stops all automation)", mod);
     }
-
+    
     @Override
-    protected void call(AltoClef mod, ArgParser parser) {
-        mod.getUserTaskChain().cancel(mod);
-        finish();
-    }
+   	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+   		builder.executes(context -> {
+   	        _mod.getUserTaskChain().cancel(_mod);
+   	        finish();
+               return SINGLE_SUCCESS;
+   		});
+   	}
 }

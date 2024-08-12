@@ -1,9 +1,9 @@
 package adris.altoclef.commandsystem;
 
+import java.util.HashMap;
+
 import adris.altoclef.TaskCatalogue;
 import adris.altoclef.util.ItemTarget;
-
-import java.util.HashMap;
 
 public class ItemList {
     public ItemTarget[] items;

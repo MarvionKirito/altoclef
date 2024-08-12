@@ -1,7 +1,21 @@
 package adris.altoclef;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.Consumer;
+
+import org.lwjgl.glfw.GLFW;
+
 import adris.altoclef.butler.Butler;
-import adris.altoclef.chains.*;
+import adris.altoclef.chains.DeathMenuChain;
+import adris.altoclef.chains.FoodChain;
+import adris.altoclef.chains.MLGBucketFallChain;
+import adris.altoclef.chains.MobDefenseChain;
+import adris.altoclef.chains.PlayerInteractionFixChain;
+import adris.altoclef.chains.UserTaskChain;
+import adris.altoclef.chains.WorldSurvivalChain;
 import adris.altoclef.commandsystem.CommandExecutor;
 import adris.altoclef.control.InputControls;
 import adris.altoclef.control.PlayerExtraController;
@@ -13,7 +27,11 @@ import adris.altoclef.eventbus.events.SendChatEvent;
 import adris.altoclef.eventbus.events.TitleScreenEntryEvent;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.tasksystem.TaskRunner;
-import adris.altoclef.trackers.*;
+import adris.altoclef.trackers.BlockTracker;
+import adris.altoclef.trackers.EntityTracker;
+import adris.altoclef.trackers.MiscBlockTracker;
+import adris.altoclef.trackers.SimpleChunkTracker;
+import adris.altoclef.trackers.TrackerManager;
 import adris.altoclef.trackers.storage.ContainerSubTracker;
 import adris.altoclef.trackers.storage.ItemStorageTracker;
 import adris.altoclef.ui.CommandStatusOverlay;
@@ -33,13 +51,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.Consumer;
 
 /**
  * Central access point for AltoClef
@@ -49,6 +60,7 @@ public class AltoClef implements ModInitializer {
     // Static access to altoclef
     private static final Queue<Consumer<AltoClef>> _postInitQueue = new ArrayDeque<>();
 
+    public static MinecraftClient mc;
     // Central Managers
     private static CommandExecutor _commandExecutor;
     private TaskRunner _taskRunner;
@@ -103,6 +115,8 @@ public class AltoClef implements ModInitializer {
         // This is the actual start point, controlled by a mixin.
 
         initializeBaritoneSettings();
+        
+        mc = MinecraftClient.getInstance();
 
         // Central Managers
         _commandExecutor = new CommandExecutor(this);
@@ -263,7 +277,7 @@ public class AltoClef implements ModInitializer {
     private void initializeCommands() {
         try {
             // This creates the commands. If you want any more commands feel free to initialize new command lists.
-            new AltoClefCommands();
+            new AltoClefCommands(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

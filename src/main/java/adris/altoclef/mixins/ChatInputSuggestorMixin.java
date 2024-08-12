@@ -4,7 +4,6 @@ import static adris.altoclef.commandsystem.suggestionsapi.Filtering.FilteringMod
 import static adris.altoclef.commandsystem.suggestionsapi.Filtering.FilteringMode.SLIGHTLY_LOOSE;
 import static adris.altoclef.commandsystem.suggestionsapi.Filtering.FilteringMode.STRICT;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -19,23 +18,29 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import adris.altoclef.AltoClef;
-import adris.altoclef.Debug;
-import adris.altoclef.commandsystem.Command;
+import adris.altoclef.Settings;
+import adris.altoclef.commandsystem.CommandExecutor;
+import adris.altoclef.util.helpers.ConfigHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.command.CommandSource;
 
 @Mixin(ChatInputSuggestor.class)
 public abstract class ChatInputSuggestorMixin {
+    @Shadow private ParseResults<CommandSource> parse;
+    @Shadow boolean completingSuggestions;
+    @Shadow private ChatInputSuggestor.SuggestionWindow window;
 	@Shadow private static int getStartOfCurrentWord(String input) {
 		throw new AssertionError();
 	}
@@ -54,6 +59,10 @@ public abstract class ChatInputSuggestorMixin {
 
     @Shadow
     public abstract void show(boolean narrateFirstSuggestion);
+    
+
+    @Shadow
+    protected abstract void showCommandSuggestions();
 
 	/**
 	 * @author VelizarBG
@@ -103,36 +112,40 @@ public abstract class ChatInputSuggestorMixin {
 	}
 
 
-	@Inject(method = "refresh", at = @At("TAIL"), cancellable = true)
-    private void inject(CallbackInfo ci) {
-		ArrayList<String> commands = new ArrayList<>();
-		for (Command command : AltoClef.getCommandExecutor().allCommands()) {
-            commands.add(command.getName());
-        }
-        String text = this.textField.getText();
-        StringReader stringReader = new StringReader(text);
-        boolean hasSlash = stringReader.canRead() && stringReader.peek() == '/';
-        if (hasSlash) {
-            stringReader.skip();
-        }
-        boolean isCommand = this.slashOptional || hasSlash;
-        int cursor = this.textField.getCursor();
-        if (!isCommand) {
-            String textUptoCursor = text.substring(0, cursor);
-            int start = Math.max(getLastPattern(textUptoCursor, COMMAND_PATTERN) - 1, 0);
-            int whitespace = getLastPattern(textUptoCursor, WHITESPACE_PATTERN);
-            if (start < textUptoCursor.length() && start >= whitespace) {
-                if (textUptoCursor.charAt(start) == '@') {
-                    this.pendingSuggestions = CommandSource.suggestMatching(commands, new SuggestionsBuilder(textUptoCursor, start));
-                    this.pendingSuggestions.thenRun(() -> {
-                        if (!this.pendingSuggestions.isDone()) {
-                            return;
-                        }
-                        this.show(false);
-                    });
-                    ci.cancel();
-                }
+	@Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false),
+	        cancellable = true,
+	        locals = LocalCapture.CAPTURE_FAILHARD)
+    private void inject(CallbackInfo ci, String string, StringReader reader) {
+		String prefix = ConfigHelper.getConfig(Settings.SETTINGS_PATH, Settings::new, Settings.class).getCommandPrefix();
+        int length = prefix.length();
+
+        if (reader.canRead(length) && reader.getString().startsWith(prefix, reader.getCursor())) {
+            String message = reader.getString();
+            reader.setCursor(reader.getCursor() + length);
+
+            if (this.parse == null) {
+                AltoClef.getCommandExecutor();
+                if (message.contains(";")) {
+                	this.parse = CommandExecutor.DISPATCHER.parse(new StringReader(message.split(";")[message.split(";").length-1]), MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
+                } else
+                	this.parse = CommandExecutor.DISPATCHER.parse(reader, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
             }
+
+            int cursor = textField.getCursor();
+            if (cursor >= length && (this.window == null || !this.completingSuggestions)) {
+                AltoClef.getCommandExecutor();
+                if (message.contains(";")) {
+                	this.pendingSuggestions = CommandExecutor.DISPATCHER.getCompletionSuggestions(this.parse, new StringReader(message.split(";")[message.split(";").length-1]).getTotalLength());
+                } else
+                	this.pendingSuggestions = CommandExecutor.DISPATCHER.getCompletionSuggestions(this.parse, cursor);
+                this.pendingSuggestions.thenRun(() -> {
+                    if (this.pendingSuggestions.isDone()) {
+                        this.showCommandSuggestions();
+                    }
+                });
+            }
+
+            ci.cancel();
         }
     }
 	

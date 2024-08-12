@@ -35,18 +35,18 @@ public class SelectionManagerMixin {
 
     @Inject(method = "insert(Ljava/lang/String;Ljava/lang/String;)V", at = @At("TAIL"))
     private void inject(String _unused, String insertion, CallbackInfo ci) {
-        String result = stringGetter.get();
-        for (Command command : AltoClef.getCommandExecutor().allCommands()) {
-            result = result.replace("@" + command.getName(), command.getName());
-        }
-
-        if (!Objects.equals(stringGetter.get(), result)) {
-            int lengthDifference = stringGetter.get().length() - result.length();
-            int newCursorPosition = Math.max(Math.min(this.selectionEnd - lengthDifference + 1, result.length()), 0);
-            this.selectionEnd = this.selectionStart = newCursorPosition;
-        }
-
-        stringSetter.accept(result);
+//        String result = stringGetter.get();
+//        for (Command command : AltoClef.getCommandExecutor().allCommands()) {
+//            result = result.replace("@" + command.getName(), command.getName());
+//        }
+//
+//        if (!Objects.equals(stringGetter.get(), result)) {
+//            int lengthDifference = stringGetter.get().length() - result.length();
+//            int newCursorPosition = Math.max(Math.min(this.selectionEnd - lengthDifference + 1, result.length()), 0);
+//            this.selectionEnd = this.selectionStart = newCursorPosition;
+//        }
+//
+//        stringSetter.accept(result);
     }
     
 }

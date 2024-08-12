@@ -1,48 +1,57 @@
 package adris.altoclef.commands;
 
+import static adris.altoclef.AltoClef.mc;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
-import adris.altoclef.commandsystem.*;
+import adris.altoclef.commands.arguments.ItemListArgumentType;
+import adris.altoclef.commandsystem.Command;
+import adris.altoclef.commandsystem.CommandException;
+import adris.altoclef.commandsystem.ItemList;
 import adris.altoclef.tasks.container.StoreInStashTask;
 import adris.altoclef.util.BlockRange;
 import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.helpers.WorldHelper;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.PosArgument;
+import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.util.math.BlockPos;
 
 public class StashCommand extends Command {
-    public StashCommand() throws CommandException {
+    public StashCommand(AltoClef mod) throws CommandException {
         // stash <stash_x> <stash_y> <stash_z> <stash_radius> [item list]
-        super("stash", "Store an item in a chest/container stash. Will deposit ALL non-equipped items if item list is empty.",
-                new Arg(Integer.class, "x_start"),
-                new Arg(Integer.class, "y_start"),
-                new Arg(Integer.class, "z_start"),
-                new Arg(Integer.class, "x_end"),
-                new Arg(Integer.class, "y_end"),
-                new Arg(Integer.class, "z_end"),
-                new Arg(ItemList.class, "items (empty for ALL)", null, 6, false));
+        super("stash", "Store an item in a chest/container stash. Will deposit ALL non-equipped items if item list is empty.", mod);
     }
 
-    @Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        BlockPos start = new BlockPos(
-                parser.get(Integer.class),
-                parser.get(Integer.class),
-                parser.get(Integer.class)
-        );
-        BlockPos end = new BlockPos(
-                parser.get(Integer.class),
-                parser.get(Integer.class),
-                parser.get(Integer.class)
-        );
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+		builder.then(argument("startPos", Vec3ArgumentType.vec3())
+				.then(argument("endPos", Vec3ArgumentType.vec3())
+				.then(argument("items", new ItemListArgumentType(REGISTRY_ACCESS))
+						.executes(context -> {
+							BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+							BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+							ItemList itemList = ItemListArgumentType.get(context);
+							ItemTarget[] items = itemList.items;
 
-        ItemList itemList = parser.get(ItemList.class);
-        ItemTarget[] items;
-        if (itemList == null) {
-            items = DepositCommand.getAllNonEquippedOrToolItemsAsTarget(mod);
-        } else {
-            items = itemList.items;
-        }
+							_mod.runUserTask(new StoreInStashTask(true, new BlockRange(startPos, endPos, WorldHelper.getCurrentDimension()), items), this::finish);
+							return SINGLE_SUCCESS;
+						}))));
+		
+		
+		builder.then(argument("startPos", Vec3ArgumentType.vec3())
+				.then(argument("endPos", Vec3ArgumentType.vec3())
+				.executes(context -> {
+					BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+					BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+					ItemTarget[] items = DepositCommand.getAllNonEquippedOrToolItemsAsTarget(_mod);
 
 
-        mod.runUserTask(new StoreInStashTask(true, new BlockRange(start, end, WorldHelper.getCurrentDimension()), items), this::finish);
-    }
+					_mod.runUserTask(new StoreInStashTask(true, new BlockRange(startPos, endPos, WorldHelper.getCurrentDimension()), items), this::finish);
+					
+					return SINGLE_SUCCESS;
+				})));
+		
+	}
 }

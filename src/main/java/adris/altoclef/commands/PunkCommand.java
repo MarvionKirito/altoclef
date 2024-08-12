@@ -1,20 +1,25 @@
 package adris.altoclef.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
-import adris.altoclef.commandsystem.Arg;
-import adris.altoclef.commandsystem.ArgParser;
+import adris.altoclef.commands.arguments.PlayerListEntryArgumentType;
 import adris.altoclef.commandsystem.Command;
 import adris.altoclef.commandsystem.CommandException;
 import adris.altoclef.tasks.entity.KillPlayerTask;
+import net.minecraft.command.CommandSource;
 
 public class PunkCommand extends Command {
-    public PunkCommand() throws CommandException {
-        super("punk", "Punk 'em", new Arg(String.class, "playerName"));
+    public PunkCommand(AltoClef mod) throws CommandException {
+        super("punk", "Punk 'em", mod);
     }
-
+    
     @Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        String playerName = parser.get(String.class);
-        mod.runUserTask(new KillPlayerTask(playerName), this::finish);
-    }
+	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+		builder.then(argument("player", PlayerListEntryArgumentType.create()).executes(context -> {
+			String username = PlayerListEntryArgumentType.get(context).toString();
+	        _mod.runUserTask(new KillPlayerTask(username), this::finish);
+            return SINGLE_SUCCESS;
+		}));
+	}
 }

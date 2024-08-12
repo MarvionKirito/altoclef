@@ -52,9 +52,6 @@ public interface CommandSourceMixin {
 		String[] candidateId = candidate.split(":", 2);
 		if (candidateId.length == 2)
 			candidate = candidateId[1];
-		
-		if (Pattern.compile("^(@)").asPredicate().test(remaining))
-			candidate = "@" + candidate;
 
 		return VERY_LOOSE.test(remaining, candidate);
 	}

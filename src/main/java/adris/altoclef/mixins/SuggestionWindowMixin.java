@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.brigadier.suggestion.Suggestion;
 
 import adris.altoclef.AltoClef;
+import adris.altoclef.Debug;
 import adris.altoclef.commandsystem.Command;
+import adris.altoclef.util.helpers.StringProcessorHelper;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
@@ -27,21 +29,39 @@ public class SuggestionWindowMixin {
     @Final
     private List<Suggestion> suggestions;
 
-    @Inject(method = "complete", at = @At("TAIL"))
+//  ChatInputSuggestorAccessor inputSuggestor = (ChatInputSuggestorAccessor) this.field_21615;
+//  if (inputSuggestor == null) return;
+//  TextFieldWidget textFieldWidget = inputSuggestor.getTextField();
+//  Suggestion suggestion = this.suggestions.get(this.selection);
+//  int just = suggestion.getRange().getStart() + suggestion.getText().length();
+//  for (Command command : AltoClef.getCommandExecutor().allCommands()) {
+//      int justTyped = just - command.getName().length();
+//      if (command.getName().startsWith(textFieldWidget.getText(), justTyped)) {
+//          textFieldWidget.eraseCharacters(-command.getName().length() - (1 + command.getName().length()));
+//          textFieldWidget.setSelectionEnd(textFieldWidget.getCursor());
+//          textFieldWidget.write("@"+command.getName());
+//          break;
+//      }
+//  }
+    
+    @Inject(method = "complete", at = @At("HEAD"), cancellable = true)
     private void overwriteComplete(CallbackInfo ci) {
         ChatInputSuggestorAccessor inputSuggestor = (ChatInputSuggestorAccessor) this.field_21615;
         if (inputSuggestor == null) return;
         TextFieldWidget textFieldWidget = inputSuggestor.getTextField();
         Suggestion suggestion = this.suggestions.get(this.selection);
         int just = suggestion.getRange().getStart() + suggestion.getText().length();
-        for (Command command : AltoClef.getCommandExecutor().allCommands()) {
-            int justTyped = just - command.getName().length();
-            if (command.getName().startsWith(textFieldWidget.getText(), justTyped)) {
-                textFieldWidget.eraseCharacters(-command.getName().length() - (1 + command.getName().length()));
-                textFieldWidget.setSelectionEnd(textFieldWidget.getCursor());
-                textFieldWidget.write("@"+command.getName());
-                break;
+            if (textFieldWidget.getText().contains(";")) {
+            	int closestIDXOfDivider = StringProcessorHelper.findClosestCharIndex(textFieldWidget.getText(), ';', textFieldWidget.getCursor()-1);
+                if (AltoClef.getCommandExecutor().allCommands().stream().anyMatch(cmd -> cmd.getName().equals(suggestion.getText()))) {
+	                textFieldWidget.eraseCharacters(closestIDXOfDivider+1 - textFieldWidget.getCursor());
+                } else {
+                	closestIDXOfDivider = StringProcessorHelper.findClosestCharIndex(textFieldWidget.getText(), ' ', textFieldWidget.getCursor()-1);
+                	textFieldWidget.eraseCharacters(closestIDXOfDivider+1 - textFieldWidget.getCursor());
+                }
+                textFieldWidget.setSelectionEnd(textFieldWidget.getText().length());
+                textFieldWidget.write(suggestion.getText());
+                ci.cancel();
             }
-        }
     }
 }

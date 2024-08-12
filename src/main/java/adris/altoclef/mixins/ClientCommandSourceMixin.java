@@ -45,12 +45,6 @@ public class ClientCommandSourceMixin {
 		return input.substring(0, cutoffIndex + 1);
 	}
 	
-//	@Overwrite
-//	public Collection<String> getChatSuggestions() {
-//		List<String> suggestions = new ArrayList<String>();
-//		suggestions.add("addfe");
-//		return suggestions;
-//	}
 	
 	@ModifyVariable(method = "onCommandSuggestions", at = @At(target = "Ljava/util/concurrent/CompletableFuture;complete(Ljava/lang/Object;)Z", value = "INVOKE", shift = At.Shift.BEFORE), index = 2, argsOnly = true)
 	private Suggestions filterSuggestions(Suggestions suggestions) {

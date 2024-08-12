@@ -63,7 +63,7 @@ public class ConfigHelper {
      * @param <T>         The type of the configuration object.
      * @return The retrieved configuration object or the default value.
      */
-    private static <T> T getConfig(String path, Supplier<T> getDefault, Class<T> classToLoad) {
+    public static <T> T getConfig(String path, Supplier<T> getDefault, Class<T> classToLoad) {
         T result = getDefault.get();
         File loadFrom = getConfigFile(path);
         if (!loadFrom.exists()) {
