@@ -4,7 +4,6 @@ import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
 import adris.altoclef.TaskCatalogue;
 import adris.altoclef.tasks.entity.DoToClosestEntityTask;
-import adris.altoclef.tasks.entity.KillEntitiesTask;
 import adris.altoclef.tasks.movement.GetToBlockTask;
 import adris.altoclef.tasks.movement.GetToXZTask;
 import adris.altoclef.tasks.movement.GetToYTask;
@@ -18,13 +17,11 @@ import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.projectile.DragonFireballEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 
 // TODO:
 // The 10 Portal pillars form a 43 block radius, but the angle offset/cycle is random.
@@ -77,13 +74,6 @@ public class WaitForDragonAndPearlTask extends Task implements IDragonWaiter {
 
     @Override
     protected Task onTick(AltoClef mod) {
-        Optional<Entity> enderMen = mod.getEntityTracker().getClosestEntity(EndermanEntity.class);
-        if (enderMen.isPresent() && (enderMen.get() instanceof EndermanEntity endermanEntity) &&
-                endermanEntity.isAngry()) {
-            setDebugState("Killing angry endermen");
-            Predicate<Entity> angry = entity -> endermanEntity.isAngry();
-            return new KillEntitiesTask(angry, enderMen.get().getClass());
-        }
         if (_throwPearlTask != null && _throwPearlTask.isActive() && !_throwPearlTask.isFinished(mod)) {
             setDebugState("Throwing pearl!");
             return _throwPearlTask;

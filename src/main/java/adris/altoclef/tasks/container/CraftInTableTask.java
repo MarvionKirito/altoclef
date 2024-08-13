@@ -303,11 +303,10 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
         mod.getBehaviour().addProtectedItems(getMaterialsArray());
 
         // Avoid breaking crafting tables
-        List<BlockPos> craftingTablePositions = mod.getBlockTracker().getKnownLocations(Blocks.CRAFTING_TABLE);
-        for (BlockPos craftingTablePos : craftingTablePositions) {
-            mod.getBehaviour().avoidBlockBreaking(craftingTablePos);
+        if (mod.getBlockTracker().isTracking(Blocks.CRAFTING_TABLE)) {
+            Optional<BlockPos> craftingTable = mod.getBlockTracker().getNearestTracking(Blocks.CRAFTING_TABLE);
+            craftingTable.ifPresent(blockPos -> mod.getBehaviour().avoidBlockBreaking(blockPos));
         }
-
         // Check if the player inventory is open and the cursor slot is empty
         if (StorageHelper.isPlayerInventoryOpen() && StorageHelper.getItemStackInCursorSlot().isEmpty()) {
             // Get the item in the craft output slot

@@ -107,7 +107,6 @@ public class CraftGenericManuallyTask extends Task {
 				if (toFill == null || toFill.isEmpty() || !toFill.matches(present.getItem()))
 				{
 					if (present.getItem() != Items.AIR && !toFill.matches(present.getItem())) {
-
 						if(!StorageHelper.getItemStackInCursorSlot().isEmpty())
 						{
 							return new EnsureFreeCursorSlotTask();
@@ -121,6 +120,17 @@ public class CraftGenericManuallyTask extends Task {
 					ItemTarget toFillInner = _target.getRecipe().getSlot(craftSlotInner);
 					if (!toFill.equals(toFillInner) || toFillInner == null || toFillInner.isEmpty())
 						continue;
+			        // Ensure our cursor is empty/can receive our item
+			        ItemStack cursor = StorageHelper.getItemStackInCursorSlot();
+			        if (!ItemHelper.canStackTogether(StorageHelper.getItemStackInSlot(outputSlot), cursor)) {
+			            Optional<Slot> toFit = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
+			            if (toFit.isPresent()) {
+			                mod.getSlotHandler().clickSlot(toFit.get(), 0, SlotActionType.PICKUP);
+			            } else if(ItemHelper.canThrowAwayStack(mod, cursor)) {
+			                // Eh screw it
+			                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, SlotActionType.PICKUP);
+			            }
+			        }
 
 					Slot currentCraftSlotInner;
 					if (bigCrafting) {

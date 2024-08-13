@@ -38,6 +38,7 @@ import baritone.api.utils.input.Input;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.Block;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
@@ -132,7 +133,7 @@ public class MobDefenseChain extends SingleTaskChain
 		if (!mod.getPlayer().isBlocking())
 		{
 			ItemStack handItem = StorageHelper.getItemStackInSlot(PlayerSlot.getEquipSlot());
-			if (handItem.isFood())
+			if (handItem.contains(DataComponentTypes.FOOD))
 			{
 				List<ItemStack> spaceSlots = mod.getItemStorage().getItemStacksPlayerInventory(false);
 				if (!spaceSlots.isEmpty())
@@ -160,7 +161,7 @@ public class MobDefenseChain extends SingleTaskChain
 		if (_shielding)
 		{
 			ItemStack cursor = StorageHelper.getItemStackInCursorSlot();
-			if (cursor.isFood())
+			if (cursor.contains(DataComponentTypes.FOOD))
 			{
 				Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false)
 						.or(() -> StorageHelper.getGarbageSlot(mod));
@@ -210,7 +211,7 @@ public class MobDefenseChain extends SingleTaskChain
 				return 0;
 			} else
 			{
-				return Math.min(activeItem.getMaxUseTime(player.getActiveItem()) - player.getItemUseTimeLeft(), 6);
+				return Math.min(activeItem.getMaxUseTime(player.getActiveItem(), player) - player.getItemUseTimeLeft(), 6);
 			}
 		}
 		return 0;
@@ -565,13 +566,13 @@ public class MobDefenseChain extends SingleTaskChain
 				for (Entity ToDealWith : toDealWith)
 				{
 					if (ToDealWith.getClass() == SlimeEntity.class || ToDealWith.getClass() == MagmaCubeEntity.class
-							|| ToDealWith.getItemsEquipped() != null && !(ToDealWith instanceof SkeletonEntity ) 
+							|| ToDealWith.getWeaponStack() != null && !(ToDealWith instanceof SkeletonEntity ) 
 							 && !(ToDealWith instanceof EndermanEntity )
 							 && !(ToDealWith instanceof DrownedEntity ))
 					{
 						// Entities that have a sword or can split into more entities after being killed count as two entities as they are more dangerous then one entity of same type
 						numberOfProblematicEntities += 2;
-					} else if (ToDealWith instanceof SkeletonEntity && ToDealWith.getItemsEquipped() == Items.BOW)
+					} else if (ToDealWith instanceof SkeletonEntity && ToDealWith.getWeaponStack().getItem() == Items.BOW)
 					{
 						// Any skeleton with a bow is REALLY dangerous so we'll count them as 6 entities
 						numberOfProblematicEntities += 6;
@@ -579,7 +580,7 @@ public class MobDefenseChain extends SingleTaskChain
 					{
 						// Enderman can be also really dangerous as they hit hard.
 						numberOfProblematicEntities += 3;
-					} else if (ToDealWith instanceof DrownedEntity && ToDealWith.getItemsEquipped() == Items.TRIDENT)
+					} else if (ToDealWith instanceof DrownedEntity && ToDealWith.getWeaponStack().getItem() == Items.TRIDENT)
 					{
 						// Drowned with tridents are also REALLY dangerous, maybe we should increase this??
 						numberOfProblematicEntities += 5;
@@ -700,18 +701,18 @@ public class MobDefenseChain extends SingleTaskChain
 					&& !mod.getItemStorage().hasItemInOffhand(Items.SHIELD)
 					|| (mod.getItemStorage().hasItemInOffhand(Items.SHIELD)
 							&& StorageHelper.getItemStackInSlot(
-									PlayerSlot.OFFHAND_SLOT).getDamage() > Items.SHIELD.getMaxDamage()
+									PlayerSlot.OFFHAND_SLOT).getDamage() > Items.SHIELD.getDefaultStack().getMaxDamage()
 											* 0.62
 							|| mod.getItemStorage().getItemCount(Items.SHIELD) == 1 && StorageHelper
 									.getItemStackInSlot(mod.getItemStorage()
 											.getSlotsWithItemPlayerInventory(false, Items.SHIELD).get(0))
-									.getDamage() > Items.SHIELD.getMaxDamage() * 0.62))
+									.getDamage() > Items.SHIELD.getDefaultStack().getMaxDamage() * 0.62))
 			{
 				// Get a shield if we dont have a decent one.
 				Boolean hasGoodShield = false;
 				for (Slot slot : mod.getItemStorage().getSlotsWithItemScreen(Items.SHIELD))
 				{
-					if (StorageHelper.getItemStackInSlot(slot).getDamage() < Items.SHIELD.getMaxDamage() * 0.62)
+					if (StorageHelper.getItemStackInSlot(slot).getDamage() < Items.SHIELD.getDefaultStack().getMaxDamage() * 0.62)
 					{
 						hasGoodShield = true;
 						break;
@@ -731,7 +732,7 @@ public class MobDefenseChain extends SingleTaskChain
 							&& StorageHelper
 									.getItemStackInSlot(
 											mod.getItemStorage().getSlotsWithItemPlayerInventory(false, item).get(0))
-									.getDamage() > item.getMaxDamage() * 0.7)
+									.getDamage() > item.getDefaultStack().getMaxDamage() * 0.7)
 					{
 						// Get a good sword if the one we have is 70% damaged
 						if (mod.getItemStorage().hasItem(Items.STONE_SWORD))

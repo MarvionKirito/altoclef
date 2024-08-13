@@ -125,7 +125,17 @@ run/
 
 .classpath
 .project/
+<<<<<<< HEAD
 .settings/
 asd_client.launch
 asd_server.launch
 bin/
+=======
+.project
+.editorconfig
+q
+.settings/
+asd_client.launch
+asd_server.launch
+bin/
+>>>>>>> CommandSuggestions

@@ -22,8 +22,8 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Call this when the place you're currently at is bad for some reason and you just wanna get away.
@@ -184,13 +184,11 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
             return _unstuckTask;
         }
         if (!_progressChecker.check(mod) || !stuckCheck.check(mod)) {
-            List<Entity> closeEntities = mod.getEntityTracker().getCloseEntities();
-            for (Entity CloseEntities : closeEntities) {
-                if (CloseEntities instanceof MobEntity &&
-                        CloseEntities.getPos().isInRange(mod.getPlayer().getPos(), 1)) {
-                    setDebugState("Killing annoying entity.");
-                    return new KillEntitiesTask(CloseEntities.getClass());
-                }
+            Optional<Entity> mob = mod.getEntityTracker().getClosestEntity(MobEntity.class);
+            if (mob.isPresent() && mob.get().getPos().isInRange(mod.getPlayer().getPos(), 1)) {
+                setDebugState("Killing annoying entity.");
+                Predicate<Entity> valid = entity -> entity == mob.get();
+                return new KillEntitiesTask(valid, mob.get().getClass());
             }
             BlockPos blockStuck = stuckInBlock(mod);
             if (blockStuck != null) {

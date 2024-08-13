@@ -172,46 +172,37 @@ public class MineAndCollectTask extends ResourceTask
 		return false;
 	}
 
+    private void makeSureToolIsEquipped(AltoClef mod) {
+        if (_cursorStackTimer.elapsed() && !mod.getFoodChain().needsToEat()) {
+            assert MinecraftClient.getInstance().player != null;
+            ItemStack cursorStack = StorageHelper.getItemStackInCursorSlot();
+            if (cursorStack != null && !cursorStack.isEmpty()) {
+                // We have something in our cursor stack
+                if (cursorStack.isSuitableFor(mod.getWorld().getBlockState(_subtask.miningPos()))) {
+                    // Our cursor stack would help us mine our current block
+                    Item currentlyEquipped = StorageHelper.getItemStackInSlot(PlayerSlot.getEquipSlot()).getItem();
+                    if (cursorStack.getItem() instanceof MiningToolItem) {
+                        if (currentlyEquipped instanceof MiningToolItem currentPick) {
+                            MiningToolItem swapPick = (MiningToolItem) cursorStack.getItem();
+                            if (swapPick.getMaterial().getMiningSpeedMultiplier() > currentPick.getMaterial().getMiningSpeedMultiplier()) {
+                                // We can equip a better pickaxe.
+                                mod.getSlotHandler().forceEquipSlot(CursorSlot.SLOT);
+                            }
+                        } else {
+                            // We're not equipped with a pickaxe...
+                            mod.getSlotHandler().forceEquipSlot(CursorSlot.SLOT);
+                        }
+                    }
+                }
+            }
+            _cursorStackTimer.reset();
+        }
+    }
+
 	@Override
 	protected String toDebugStringName()
 	{
 		return "Mine And Collect";
-	}
-
-	private void makeSureToolIsEquipped(AltoClef mod)
-	{
-		if (_cursorStackTimer.elapsed() && !mod.getFoodChain().needsToEat())
-		{
-			assert MinecraftClient.getInstance().player != null;
-			ItemStack cursorStack = StorageHelper.getItemStackInCursorSlot();
-			if (cursorStack != null && !cursorStack.isEmpty())
-			{
-				// We have something in our cursor stack
-				Item item = cursorStack.getItem();
-				if (item.isSuitableFor(mod.getWorld().getBlockState(_subtask.miningPos())))
-				{
-					// Our cursor stack would help us mine our current block
-					Item currentlyEquipped = StorageHelper.getItemStackInSlot(PlayerSlot.getEquipSlot()).getItem();
-					if (item instanceof MiningToolItem)
-					{
-						if (currentlyEquipped instanceof MiningToolItem currentPick)
-						{
-							MiningToolItem swapPick = (MiningToolItem) item;
-							if (swapPick.getMaterial().getMiningLevel() > currentPick.getMaterial().getMiningLevel())
-							{
-								// We can equip a better pickaxe.
-								mod.getSlotHandler().forceEquipSlot(CursorSlot.SLOT);
-							}
-						} else
-						{
-							// We're not equipped with a pickaxe...
-							mod.getSlotHandler().forceEquipSlot(CursorSlot.SLOT);
-						}
-					}
-				}
-			}
-			_cursorStackTimer.reset();
-		}
 	}
 
 	protected static boolean isOre(BlockState state)
@@ -252,7 +243,7 @@ public class MineAndCollectTask extends ResourceTask
 				for (Slot slot : mod.getItemStorage().getSlotsWithItemScreen(pickaxe))
 				{
 					if (slot.getInventorySlot() > -1 && mod.getItemStorage().getItemStacksPlayerInventory(false)
-							.get(slot.getInventorySlot()).getDamage() < (pickaxe.getMaxDamage() * 0.6))
+							.get(slot.getInventorySlot()).getDamage() < (pickaxe.getDefaultStack().getMaxDamage() * 0.6))
 					{
 						return false;
 					}

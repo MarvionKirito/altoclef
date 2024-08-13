@@ -290,7 +290,12 @@ public class InteractWithBlockTask extends Task {
         }
 
         int reachDistance = 0;
-        Goal moveGoal = createGoalForInteract(_target, reachDistance, _direction, _interactOffset, _walkInto);
+        Goal moveGoal;
+        if (mod.getExtraBaritoneSettings().shouldAvoidBreaking(_target.up())) {
+            moveGoal = new GoalTwoBlocks(_target.north());
+        } else {
+            moveGoal = createGoalForInteract(_target, reachDistance, _direction, _interactOffset, _walkInto);
+        }
         ICustomGoalProcess proc = mod.getClientBaritone().getCustomGoalProcess();
 
         _cachedClickStatus = rightClick(mod);
@@ -395,18 +400,19 @@ public class InteractWithBlockTask extends Task {
         }
 
         Optional<Rotation> reachable = getCurrentReach();
-        if (reachable.isPresent()) {
+        if (reachable.isPresent() && mod.getClientBaritone().getPathingBehavior().isSafeToCancel()) {
             if (LookHelper.isLookingAt(mod, _target)) {
                 if (_toUse != null) {
                     mod.getSlotHandler().forceEquipItem(_toUse, false);
                 } else {
                     mod.getSlotHandler().forceDeequipRightClickableItem();
                 }
-                mod.getInputControls().tryPress(_interactInput);
+                mod.getInputControls().hold(_interactInput);
                 if (mod.getInputControls().isHeldDown(_interactInput)) {
                     if (_shiftClick) {
                         mod.getInputControls().hold(Input.SNEAK);
                     }
+                    mod.getInputControls().release(_interactInput);
                     return ClickResponse.CLICK_ATTEMPTED;
                 }
                 //mod.getClientBaritone().getInputOverrideHandler().setInputForceState(_interactInput, true);

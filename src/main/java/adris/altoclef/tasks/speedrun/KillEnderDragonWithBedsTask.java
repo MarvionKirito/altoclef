@@ -11,6 +11,7 @@ import adris.altoclef.util.helpers.LookHelper;
 import adris.altoclef.util.helpers.WorldHelper;
 import baritone.api.utils.input.Input;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.phase.Phase;
 import net.minecraft.entity.boss.dragon.phase.PhaseType;
@@ -18,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
+import java.util.Optional;
 
 public class KillEnderDragonWithBedsTask extends Task {
     private final Task _whenNotPerchingTask;
@@ -61,8 +62,8 @@ public class KillEnderDragonWithBedsTask extends Task {
             Else:
                 // Perform "Default Wander" mode and avoid dragon breath.
          */
-        List<EnderDragonEntity> dragons = mod.getEntityTracker().getTrackedEntities(EnderDragonEntity.class);
-        if (dragons.isEmpty() && !isDragonPresent) {
+        Optional<Entity> dragon = mod.getEntityTracker().getClosestEntity(EnderDragonEntity.class);
+        if (dragon.isEmpty() && !isDragonPresent) {
             setDebugState("Waiting for dragon to spawn.");
             return null;
         }
@@ -98,85 +99,84 @@ public class KillEnderDragonWithBedsTask extends Task {
             }
             isDragonDead = true;
         }
-        if (!dragons.isEmpty()) {
-            for (EnderDragonEntity dragon : dragons) {
-                Phase dragonPhase = dragon.getPhaseManager().getCurrent();
+        if (dragon.isPresent()) {
+            EnderDragonEntity dragonEntity = (EnderDragonEntity) dragon.get();
+            Phase dragonPhase = dragonEntity.getPhaseManager().getCurrent();
 
-                boolean perching = dragonPhase.getType() == PhaseType.LANDING || dragonPhase.isSittingOrHovering() || dragonPhase.getType() == PhaseType.LANDING_APPROACH;
-                if (dragon.getY() < _endPortalTop.getY() + 2) {
-                    // Dragon is already perched.
-                    perching = false;
+            boolean perching = dragonPhase.getType() == PhaseType.LANDING || dragonPhase.isSittingOrHovering() || dragonPhase.getType() == PhaseType.LANDING_APPROACH;
+            if (dragonEntity.getY() < _endPortalTop.getY() + 2) {
+                // Dragon is already perched.
+                perching = false;
+            }
+            ((IDragonWaiter) _whenNotPerchingTask).setPerchState(perching);
+            // When the dragon is not perching...
+            if (_whenNotPerchingTask.isActive() && !_whenNotPerchingTask.isFinished(mod)) {
+                setDebugState("Dragon not perching, performing special behavior...");
+                return _whenNotPerchingTask;
+            }
+            if (perching) {
+                mod.getFoodChain().shouldStop(true);
+                BlockPos targetStandPosition = _endPortalTop.add(-1, -1, 0);
+                BlockPos playerPosition = mod.getPlayer().getBlockPos();
+                // If we're not positioned (above is OK), go there and make sure we're at the right height.
+                if (_positionTask != null && _positionTask.isActive() && !_positionTask.isFinished(mod)) {
+                    setDebugState("Going to position for bed cycle...");
+                    return _positionTask;
                 }
-                ((IDragonWaiter) _whenNotPerchingTask).setPerchState(perching);
-                // When the dragon is not perching...
-                if (_whenNotPerchingTask.isActive() && !_whenNotPerchingTask.isFinished(mod)) {
-                    setDebugState("Dragon not perching, performing special behavior...");
-                    return _whenNotPerchingTask;
-                }
-                if (perching) {
-                    mod.getFoodChain().shouldStop(true);
-                    BlockPos targetStandPosition = _endPortalTop.add(-1, -1, 0);
-                    BlockPos playerPosition = mod.getPlayer().getBlockPos();
-                    // If we're not positioned (above is OK), go there and make sure we're at the right height.
-                    if (_positionTask != null && _positionTask.isActive() && !_positionTask.isFinished(mod)) {
-                        setDebugState("Going to position for bed cycle...");
-                        return _positionTask;
-                    }
-                    if ((!WorldHelper.inRangeXZ(WorldHelper.toVec3d(targetStandPosition), mod.getPlayer().getPos(), 0.50))
+                if ((!WorldHelper.inRangeXZ(WorldHelper.toVec3d(targetStandPosition), mod.getPlayer().getPos(), 0.50))
 //                            && mod.getPlayer().getVelocity().getX() == 0 && mod.getPlayer().getVelocity().getY() == 0 && mod.getPlayer().getVelocity().getZ() == 0
-                    ) {
-                        _positionTask = new GetToBlockTask(targetStandPosition);
-                        Debug.logMessage("Going to position for bed cycle...");
-                        setDebugState("Moving to target stand position");
-                        return _positionTask;
-                    }
-                    // We're positioned. Perform bed strats!
-                    BlockPos bedTargetPosition = _endPortalTop.up();
-                    boolean bedPlaced = mod.getBlockTracker().blockIsValid(bedTargetPosition, ItemHelper.itemsToBlocks(ItemHelper.BED));
-                    if (!bedPlaced) {
-                        setDebugState("Placing bed");
-                        // If no bed, place bed.
-                        // Fire messes up our "reach" so we just assume we're good when we're above a height.
-                        boolean canPlace = LookHelper.getCameraPos(mod).y > bedTargetPosition.getY();
-                        //Optional<Rotation> placeReach = LookHelper.getReach(bedTargetPosition.down(), Direction.UP);
-                        if (canPlace) {
-                            // Look at and place!
-                            if (mod.getSlotHandler().forceEquipItem(ItemHelper.BED, true)) {
-                                LookHelper.lookAt(mod, bedTargetPosition.down(), Direction.UP, true);
-                                //mod.getClientBaritone().getLookBehavior().updateTarget(placeReach.get(), true);
-                                //if (mod.getClientBaritone().getPlayerContext().isLookingAt(bedTargetPosition.down())) {
-                                // There could be fire so eh place right away
-                                mod.getInputControls().tryPress(Input.CLICK_RIGHT);
-                                //}
-                            }
-                        } else {
-                            if (mod.getPlayer().isOnGround()) {
-                                // Jump
-                                mod.getInputControls().tryPress(Input.JUMP);
-                            }
+                ) {
+                    _positionTask = new GetToBlockTask(targetStandPosition);
+                    Debug.logMessage("Going to position for bed cycle...");
+                    setDebugState("Moving to target stand position");
+                    return _positionTask;
+                }
+                // We're positioned. Perform bed strats!
+                BlockPos bedTargetPosition = _endPortalTop.up();
+                boolean bedPlaced = mod.getBlockTracker().blockIsValid(bedTargetPosition, ItemHelper.itemsToBlocks(ItemHelper.BED));
+                if (!bedPlaced) {
+                    setDebugState("Placing bed");
+                    // If no bed, place bed.
+                    // Fire messes up our "reach" so we just assume we're good when we're above a height.
+                    boolean canPlace = LookHelper.getCameraPos(mod).y > bedTargetPosition.getY();
+                    //Optional<Rotation> placeReach = LookHelper.getReach(bedTargetPosition.down(), Direction.UP);
+                    if (canPlace) {
+                        // Look at and place!
+                        if (mod.getSlotHandler().forceEquipItem(ItemHelper.BED, true)) {
+                            LookHelper.lookAt(mod, bedTargetPosition.down(), Direction.UP, true);
+                            //mod.getClientBaritone().getLookBehavior().updateTarget(placeReach.get(), true);
+                            //if (mod.getClientBaritone().getPlayerContext().isLookingAt(bedTargetPosition.down())) {
+                            // There could be fire so eh place right away
+                            mod.getInputControls().tryPress(Input.CLICK_RIGHT);
+                            //}
                         }
                     } else {
-                        setDebugState("Wait for it...");
-                        // Make sure we're standing on the ground so we don't blow ourselves up lmfao
-                        if (!mod.getPlayer().isOnGround()) {
-                            // Wait to fall
-                            return null;
+                        if (mod.getPlayer().isOnGround()) {
+                            // Jump
+                            mod.getInputControls().tryPress(Input.JUMP);
                         }
-                        // Wait for dragon head to be close enough to the bed's head...
-                        BlockPos bedfoot = WorldHelper.getBedFoot(mod, bedTargetPosition);
-                        assert bedfoot != null;
-                        Vec3d headPos = dragon.head.getBoundingBox().getCenter(); // dragon.head.getPos();
-                        double dist = headPos.distanceTo(WorldHelper.toVec3d(bedfoot));
-                        Debug.logMessage("Dist: " + dist + " Health: " + dragon.getHealth());
-
-                        if (dist < BeatMinecraft2Task.getConfig().dragonHeadCloseEnoughClickBedRange) {
-                            // Interact with the bed.
-                            return new InteractWithBlockTask(bedTargetPosition);
-                        }
-                        // Wait for it...
                     }
-                    return null;
+                } else {
+                    setDebugState("Wait for it...");
+                    // Make sure we're standing on the ground so we don't blow ourselves up lmfao
+                    if (!mod.getPlayer().isOnGround()) {
+                        // Wait to fall
+                        return null;
+                    }
+                    // Wait for dragon head to be close enough to the bed's head...
+                    BlockPos bedfoot = WorldHelper.getBedFoot(mod, bedTargetPosition);
+                    assert bedfoot != null;
+                    Vec3d headPos = dragonEntity.head.getBoundingBox().getCenter(); // dragon.head.getPos();
+                    double dist = headPos.distanceTo(WorldHelper.toVec3d(bedfoot));
+                    Debug.logMessage("Dist: " + dist + " Health: " + dragonEntity.getHealth());
+
+                    if (dist < BeatMinecraft2Task.getConfig().dragonHeadCloseEnoughClickBedRange) {
+                        // Interact with the bed.
+                        return new InteractWithBlockTask(bedTargetPosition);
+                    }
+                    // Wait for it...
                 }
+                return null;
             }
         }
         mod.getFoodChain().shouldStop(false);

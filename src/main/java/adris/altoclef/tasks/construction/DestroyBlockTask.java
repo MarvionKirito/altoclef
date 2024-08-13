@@ -1,6 +1,7 @@
 package adris.altoclef.tasks.construction;
 
 import adris.altoclef.AltoClef;
+import adris.altoclef.Debug;
 import adris.altoclef.tasks.movement.RunAwayFromPositionTask;
 import adris.altoclef.tasks.movement.SafeRandomShimmyTask;
 import adris.altoclef.tasksystem.ITaskRequiresGrounded;
@@ -10,6 +11,7 @@ import adris.altoclef.util.helpers.LookHelper;
 import adris.altoclef.util.helpers.StorageHelper;
 import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.progresscheck.MovementProgressChecker;
+import adris.altoclef.util.slots.PlayerSlot;
 import adris.altoclef.util.slots.Slot;
 import baritone.api.pathing.goals.GoalBlock;
 import baritone.api.pathing.goals.GoalNear;
@@ -18,6 +20,7 @@ import baritone.api.utils.input.Input;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.PillagerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
@@ -288,9 +291,9 @@ public class DestroyBlockTask extends Task implements ITaskRequiresGrounded {
         }
 
         Optional<Rotation> reach = LookHelper.getReach(_pos);
-        if (reach.isPresent() && (mod.getPlayer().isTouchingWater() || mod.getPlayer().isOnGround()) &&
-                !mod.getFoodChain().needsToEat() && !WorldHelper.isInNetherPortal(mod) &&
-                !mod.getClientBaritone().getPathingBehavior().isPathing()) {
+        if (reach.isPresent() && (mod.getPlayer().isTouchingWater() || mod.getPlayer().isOnGround())
+                && !mod.getFoodChain().needsToEat() && !WorldHelper.isInNetherPortal(mod)
+                && mod.getClientBaritone().getPathingBehavior().isSafeToCancel()) {
             setDebugState("Block in range, mining...");
             stuckCheck.reset();
             isMining = true;
@@ -302,7 +305,25 @@ public class DestroyBlockTask extends Task implements ITaskRequiresGrounded {
             if (!LookHelper.isLookingAt(mod, reach.get())) {
                 LookHelper.lookAt(mod, reach.get());
             }
-            // Tool equip is handled in `PlayerInteractionFixChain`. Oof.
+            BlockState state = mod.getWorld().getBlockState(_pos);
+            Optional<Slot> bestToolSlot = StorageHelper.getBestToolSlot(mod, state);
+            Slot currentEquipped = PlayerSlot.getEquipSlot();
+            // if baritone is running, only accept tools OUTSIDE OF HOTBAR!
+            // Baritone will take care of tools inside the hotbar.
+            if (bestToolSlot.isPresent() && bestToolSlot.get() != currentEquipped) {
+                // ONLY equip if the item class is STRICTLY different (otherwise we swap around a lot)
+                if (StorageHelper.getItemStackInSlot(currentEquipped).getItem() != StorageHelper.getItemStackInSlot(bestToolSlot.get()).getItem()) {
+                    boolean isAllowedToManage = !mod.getClientBaritone().getPathingBehavior().isPathing()
+                            && !mod.getFoodChain().isTryingToEat();
+                    if (isAllowedToManage) {
+                        Debug.logMessage("Found better tool in inventory, equipping.");
+                        ItemStack bestToolItemStack = StorageHelper.getItemStackInSlot(bestToolSlot.get());
+                        Item bestToolItem = bestToolItemStack.getItem();
+                        mod.getSlotHandler().forceEquipItem(bestToolItem);
+                    }
+                    return null;
+                }
+            }
             mod.getClientBaritone().getInputOverrideHandler().setInputForceState(Input.CLICK_LEFT, true);
         } else {
             setDebugState("Getting to block...");

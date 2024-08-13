@@ -113,17 +113,15 @@ public abstract class CustomBaritoneGoalTask extends Task implements ITaskRequir
                 mod.getInputControls().hold(Input.SNEAK);
                 mod.getInputControls().hold(Input.MOVE_FORWARD);
                 return null;
-            } else {
-                mod.getInputControls().release(Input.SNEAK);
-                mod.getInputControls().release(Input.MOVE_BACK);
-                mod.getInputControls().release(Input.MOVE_FORWARD);
             }
-        } else {
-            if (mod.getClientBaritone().getPathingBehavior().isPathing()) {
-                mod.getInputControls().release(Input.SNEAK);
-                mod.getInputControls().release(Input.MOVE_BACK);
-                mod.getInputControls().release(Input.MOVE_FORWARD);
-            }
+            mod.getInputControls().release(Input.SNEAK);
+            mod.getInputControls().release(Input.MOVE_BACK);
+            mod.getInputControls().release(Input.MOVE_FORWARD);
+        }
+        if (mod.getClientBaritone().getPathingBehavior().isPathing()) {
+            mod.getInputControls().release(Input.SNEAK);
+            mod.getInputControls().release(Input.MOVE_BACK);
+            mod.getInputControls().release(Input.MOVE_FORWARD);
         }
         if (_unstuckTask != null && _unstuckTask.isActive() && !_unstuckTask.isFinished(mod) && stuckInBlock(mod) != null) {
             setDebugState("Getting unstuck from block.");

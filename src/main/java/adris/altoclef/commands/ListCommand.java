@@ -1,23 +1,27 @@
 package adris.altoclef.commands;
 
-import adris.altoclef.AltoClef;
-import adris.altoclef.TaskCatalogue;
-import adris.altoclef.commandsystem.ArgParser;
-import adris.altoclef.commandsystem.Command;
-import adris.altoclef.commandsystem.CommandException;
-import adris.altoclef.ui.MessagePriority;
-
 import java.util.Arrays;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
+import adris.altoclef.AltoClef;
+import adris.altoclef.TaskCatalogue;
+import adris.altoclef.commandsystem.Command;
+import adris.altoclef.ui.MessagePriority;
+import net.minecraft.command.CommandSource;
+
 public class ListCommand extends Command {
-    public ListCommand() {
-        super("list", "List all obtainable items");
+    public ListCommand(AltoClef mod) {
+        super("list", "List all obtainable items", mod);
     }
 
     @Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        mod.log("#### LIST OF ALL OBTAINABLE ITEMS ####", MessagePriority.OPTIONAL);
-        mod.log(Arrays.toString(TaskCatalogue.resourceNames().toArray()), MessagePriority.OPTIONAL);
-        mod.log("############# END LIST ###############", MessagePriority.OPTIONAL);
+	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+		builder.executes(context -> {
+	        _mod.log("#### LIST OF ALL OBTAINABLE ITEMS ####", MessagePriority.OPTIONAL);
+	        _mod.log(Arrays.toString(TaskCatalogue.resourceNames().toArray()), MessagePriority.OPTIONAL);
+	        _mod.log("############# END LIST ###############", MessagePriority.OPTIONAL);
+			return SINGLE_SUCCESS;
+		});
     }
 }

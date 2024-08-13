@@ -10,6 +10,7 @@ import adris.altoclef.trackers.BlockTracker;
 import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.progresscheck.MovementProgressChecker;
+import baritone.api.utils.input.Input;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -144,6 +145,15 @@ public class PlaceObsidianBucketTask extends Task {
             // Would lead to an embarrassing death.
             BlockPos targetPos = _pos.add(-1, 1, 0);
             if (!mod.getPlayer().getBlockPos().equals(targetPos) && mod.getItemStorage().hasItem(Items.LAVA_BUCKET)) {
+                if (!mod.getClientBaritone().getPathingBehavior().isPathing()
+                        && targetPos.isWithinDistance(mod.getPlayer().getBlockPos(), 2)) {
+                    mod.getInputControls().hold(Input.SNEAK);
+                    mod.getInputControls().hold(Input.MOVE_BACK);
+                } else {
+                    mod.getInputControls().release(Input.SNEAK);
+                    mod.getInputControls().release(Input.MOVE_BACK);
+                    mod.getInputControls().release(Input.MOVE_FORWARD);
+                }
                 return new GetToBlockTask(targetPos, false);
             }
             if (WorldHelper.isSolid(mod, _pos)) {

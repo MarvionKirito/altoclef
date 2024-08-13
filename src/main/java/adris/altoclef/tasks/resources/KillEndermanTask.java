@@ -7,8 +7,11 @@ import adris.altoclef.tasks.entity.KillEntityTask;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.time.TimerGame;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.item.Items;
+
+import java.util.Optional;
 
 public class KillEndermanTask extends ResourceTask {
 
@@ -39,14 +42,14 @@ public class KillEndermanTask extends ResourceTask {
         }
 
         // Kill the angry one
-        for (EndermanEntity entity : mod.getEntityTracker().getTrackedEntities(EndermanEntity.class)) {
+        Optional<Entity> enderman = mod.getEntityTracker().getClosestEntity(EndermanEntity.class);
+        if (enderman.isPresent()) {
+            EndermanEntity endermanEntity = (EndermanEntity) enderman.get();
             final int TOO_FAR_AWAY = 256;
-
-            if (entity.isAngry() && entity.getPos().isInRange(mod.getPlayer().getPos(), TOO_FAR_AWAY)) {
-                return new KillEntityTask(entity);
+            if (endermanEntity.isAngry() && endermanEntity.getPos().isInRange(mod.getPlayer().getPos(), TOO_FAR_AWAY)) {
+                return new KillEntityTask(endermanEntity);
             }
         }
-
         // Attack the closest one
         return new KillEntitiesTask(EndermanEntity.class);
     }

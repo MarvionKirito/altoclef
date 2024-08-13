@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
 import adris.altoclef.TaskCatalogue;
+import adris.altoclef.commands.arguments.ItemListArgumentType;
 import adris.altoclef.commandsystem.Arg;
 import adris.altoclef.commandsystem.ArgParser;
 import adris.altoclef.commandsystem.Command;
@@ -22,6 +25,7 @@ import adris.altoclef.util.MiningRequirement;
 import adris.altoclef.util.helpers.ItemHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -41,8 +45,8 @@ public class BranchMineCommand extends Command {
     	}
     };
 
-	public BranchMineCommand() throws CommandException {
-        super("branchMine", "Create a branch mine from the current position in direction bot is currently looking at", new Arg(ItemList.class, _dropToOre.keySet().toString()));
+	public BranchMineCommand(AltoClef mod) throws CommandException {
+        super("branchMine", "Create a branch mine from the current position in direction bot is currently looking at", mod);
 	}
 	
 	private static void OnResourceDoesNotExist(AltoClef mod, String resource) {
@@ -86,21 +90,14 @@ public class BranchMineCommand extends Command {
         }
     }
 	
-//	@Override
-//    protected void call(AltoClef mod, ArgParser parser) {
-//
-//		mod.runUserTask(new BranchMiningTask(
-//				mod.getPlayer().getBlockPos(), 
-//				mod.getPlayer().getMovementDirection(),
-//				Blocks.REDSTONE_ORE
-//				), this::finish);
-//    }
-	
 	@Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        ItemList items = parser.get(ItemList.class);
-        GetItems(mod, items.items);
-    }
+	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+		builder.then(argument("items", new ItemListArgumentType(REGISTRY_ACCESS, (item) -> _dropToOre.containsKey(item))).executes(context -> {
+	        GetItems(_mod, ItemListArgumentType.get(context).items);
+	        return SINGLE_SUCCESS;
+		}));
+		
+	}
 	
 	
 	class OreDistribution {
@@ -188,5 +185,7 @@ public class BranchMineCommand extends Command {
 //	    	throw new IllegalArgumentException("Unexpected value: " + block);
 		}
 	}
+
+
 
 }

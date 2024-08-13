@@ -1,23 +1,29 @@
 package adris.altoclef.commands;
 
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
-import adris.altoclef.commandsystem.Arg;
-import adris.altoclef.commandsystem.ArgParser;
 import adris.altoclef.commandsystem.Command;
 import adris.altoclef.commandsystem.CommandException;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.CommandSource;
 
 public class SetGammaCommand extends Command {
 
-    public SetGammaCommand() throws CommandException {
-        super("gamma", "Sets the brightness to a value", new Arg<>(Double.class, "gamma", 1.0, 0));
+    public SetGammaCommand(AltoClef mod) throws CommandException {
+        super("gamma", "Sets the brightness to a value", mod);
     }
-
-    @Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        double gammaValue = parser.get(Double.class);
-        Debug.logMessage("Gamma set to " + gammaValue);
-        MinecraftClient.getInstance().options.getGamma().setValue(gammaValue);
-    }
+    
+    @SuppressWarnings("resource")
+	@Override
+   	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+   		builder.then(argument("gamma", DoubleArgumentType.doubleArg()).executes(context -> {
+	        double gammaValue = DoubleArgumentType.getDouble(context, "gamma");
+	        Debug.logMessage("Gamma set to " + gammaValue);
+	        MinecraftClient.getInstance().options.getGamma().setValue(gammaValue);
+           return SINGLE_SUCCESS;
+		}));
+   	}
 }

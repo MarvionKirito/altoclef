@@ -46,7 +46,7 @@ public class GetPickaxesTask extends Task
 		if (stonePickSlots.size() == 1 && stonePickSlots.get(0).getInventorySlot() > -1
 				&& mod.getItemStorage().getItemStacksPlayerInventory(false)
 						.get(stonePickSlots.get(0).getInventorySlot())
-						.getDamage() > (Items.STONE_PICKAXE.getMaxDamage() * 0.6))
+						.getDamage() > (Items.STONE_PICKAXE.getDefaultStack().getMaxDamage() * 0.6))
 		{
 			return TaskCatalogue.getItemTask(Items.STONE_PICKAXE, 2);
 		}

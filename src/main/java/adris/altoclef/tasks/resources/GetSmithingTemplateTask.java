@@ -12,6 +12,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.Optional;
+
 public class GetSmithingTemplateTask extends ResourceTask {
 
     private final Task _searcher = new SearchChunkForBlockTask(Blocks.BLACKSTONE);
@@ -40,10 +42,10 @@ public class GetSmithingTemplateTask extends ResourceTask {
         //    _bastionloc = null;
         // }
         if (_chestloc == null) {
-            for (BlockPos pos : mod.getBlockTracker().getKnownLocations(Blocks.CHEST)) {
-                if (WorldHelper.isInteractableBlock(mod, pos)) {
-                    _chestloc = pos;
-                    break;
+            if (mod.getBlockTracker().isTracking(Blocks.CHEST)) {
+                Optional<BlockPos> chest = mod.getBlockTracker().getNearestTracking(Blocks.CHEST);
+                if (chest.isPresent() && WorldHelper.isInteractableBlock(mod, chest.get())) {
+                    _chestloc = chest.get();
                 }
             }
         }
@@ -54,10 +56,10 @@ public class GetSmithingTemplateTask extends ResourceTask {
                 return new DestroyBlockTask(_chestloc);
             } else {
                 _chestloc = null;
-                for (BlockPos pos : mod.getBlockTracker().getKnownLocations(Blocks.CHEST)) {
-                    if (WorldHelper.isInteractableBlock(mod, pos)) {
-                        _chestloc = pos;
-                        break;
+                if (mod.getBlockTracker().isTracking(Blocks.CHEST)) {
+                    Optional<BlockPos> chest = mod.getBlockTracker().getNearestTracking(Blocks.CHEST);
+                    if (chest.isPresent() && WorldHelper.isInteractableBlock(mod, chest.get())) {
+                        _chestloc = chest.get();
                     }
                 }
             }

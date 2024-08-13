@@ -321,7 +321,7 @@ public class BranchMiningTask extends Task implements ITaskRequiresGrounded {
 					if(
 						mod.getItemStorage().getItemStacksPlayerInventory(false).get(
 								slot.getInventorySlot()
-						).getDamage() < (pickaxe.getMaxDamage() * 0.4)
+						).getDamage() < (pickaxe.getDefaultStack().getMaxDamage() * 0.4)
 					) {
 		    			return false;
 					}

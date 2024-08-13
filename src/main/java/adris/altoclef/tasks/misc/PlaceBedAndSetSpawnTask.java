@@ -11,6 +11,7 @@ import adris.altoclef.tasks.DoToClosestBlockTask;
 import adris.altoclef.tasks.InteractWithBlockTask;
 import adris.altoclef.tasks.construction.DestroyBlockTask;
 import adris.altoclef.tasks.construction.PlaceStructureBlockTask;
+import adris.altoclef.tasks.entity.KillEntitiesTask;
 import adris.altoclef.tasks.movement.DefaultGoToDimensionTask;
 import adris.altoclef.tasks.movement.GetToBlockTask;
 import adris.altoclef.tasks.movement.TimeoutWanderTask;
@@ -28,13 +29,16 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.SleepingChatScreen;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class PlaceBedAndSetSpawnTask extends Task {
 
@@ -239,54 +243,73 @@ public class PlaceBedAndSetSpawnTask extends Task {
                 return null;
             }
         }
-        if (mod.getBlockTracker().anyFound(blockPos -> (WorldHelper.canReach(mod, blockPos) &&
-                blockPos.isWithinDistance(mod.getPlayer().getPos(), 40) &&
-                mod.getItemStorage().hasItem(ItemHelper.BED)) || (WorldHelper.canReach(mod, blockPos) &&
-                !mod.getItemStorage().hasItem(ItemHelper.BED)), ItemHelper.itemsToBlocks(ItemHelper.BED))) {
-            // Sleep in the nearest bed
-            setDebugState("Going to bed to sleep...");
-            return new DoToClosestBlockTask(toSleepIn -> {
-                boolean closeEnough = toSleepIn.isWithinDistance(mod.getPlayer().getPos(), 3);
-                if (closeEnough) {
-                    // why 0.2? I'm tired.
-                    Vec3d centerBed = new Vec3d(toSleepIn.getX() + 0.5, toSleepIn.getY() + 0.2, toSleepIn.getZ() + 0.5);
-                    BlockHitResult hit = LookHelper.raycast(mod.getPlayer(), centerBed, 6);
-                    // TODO: Kinda ugly, but I'm tired and fixing for the 2nd attempt speedrun so I will fix this block later
-                    closeEnough = false;
-                    if (hit.getType() != HitResult.Type.MISS) {
-                        // At this poinAt, if we miss, we probably are close enough.
-                        BlockPos p = hit.getBlockPos();
-                        if (ArrayUtils.contains(ItemHelper.itemsToBlocks(ItemHelper.BED), mod.getWorld().getBlockState(p).getBlock())) {
-                            // We have a bed!
-                            closeEnough = true;
+        Block[] copperBlocks = ItemHelper.itemsToBlocks(ItemHelper.COPPER_BLOCKS);
+        Optional<BlockPos> nearestBed = mod.getBlockTracker().getNearestTracking(ItemHelper.itemsToBlocks(ItemHelper.BED));
+        if (nearestBed.isPresent() && !WorldHelper.isAir(mod, nearestBed.get())) {
+            Block bed = mod.getWorld().getBlockState(nearestBed.get()).getBlock();
+            for (Block CopperBlock : copperBlocks) {
+                Block blockBelow = mod.getWorld().getBlockState(nearestBed.get().down()).getBlock();
+                if (blockBelow == CopperBlock) {
+                    mod.getBlockTracker().requestBlockUnreachable(nearestBed.get(), 0);
+                    return null;
+                }
+            }
+            if (nearestBed.get().isWithinDistance(mod.getPlayer().getPos(), 40)) {
+                // Check if there are monsters nearby
+                Vec3d vec3d = Vec3d.ofBottomCenter(nearestBed.get());
+                List<HostileEntity> list = mod.getWorld().getEntitiesByClass(HostileEntity.class, new Box(vec3d.getX() - 8.0, vec3d.getY() - 5.0, vec3d.getZ() - 8.0, vec3d.getX() + 8.0, vec3d.getY() + 5.0, vec3d.getZ() + 8.0), (entity) -> entity.isAngryAt(mod.getPlayer()));
+                if (!list.isEmpty()) {
+                    for (HostileEntity entity : list) {
+                        setDebugState("Killing monster nearby");
+                        Predicate<Entity> valid = e -> e == entity;
+                        return new KillEntitiesTask(valid, entity.getClass());
+                    }
+                }
+                // Sleep in the nearest bed
+                setDebugState("Going to bed to sleep...");
+                return new DoToClosestBlockTask(toSleepIn -> {
+                    boolean closeEnough = toSleepIn.isWithinDistance(mod.getPlayer().getPos(), 3);
+                    if (closeEnough) {
+                        // why 0.2? I'm tired.
+                        Vec3d centerBed = new Vec3d(toSleepIn.getX() + 0.5, toSleepIn.getY() + 0.2, toSleepIn.getZ() + 0.5);
+                        BlockHitResult hit = LookHelper.raycast(mod.getPlayer(), centerBed, 6);
+                        // TODO: Kinda ugly, but I'm tired and fixing for the 2nd attempt speedrun so I will fix this block later
+                        closeEnough = false;
+                        if (hit.getType() != HitResult.Type.MISS) {
+                            // At this poinAt, if we miss, we probably are close enough.
+                            BlockPos p = hit.getBlockPos();
+                            if (ArrayUtils.contains(new Block[]{bed}, mod.getWorld().getBlockState(p).getBlock())) {
+                                // We have a bed!
+                                closeEnough = true;
+                            }
                         }
                     }
-                }
-                _bedForSpawnPoint = WorldHelper.getBedHead(mod, toSleepIn);
-                if (_bedForSpawnPoint == null) {
-                    _bedForSpawnPoint = toSleepIn;
-                }
-                if (!closeEnough) {
-                    try {
-                        Direction face = mod.getWorld().getBlockState(toSleepIn).get(BedBlock.FACING);
-                        Direction side = face.rotateYClockwise();
-                        /*
-                        BlockPos targetMove = toSleepIn.offset(side).offset(side); // Twice, juust to make sure...
-                         */
-                        return new GetToBlockTask(_bedForSpawnPoint.add(side.getVector()));
-                    } catch (IllegalArgumentException e) {
-                        // If bed is not loaded, this will happen. In that case just get to the bed first.
+                    _bedForSpawnPoint = WorldHelper.getBedHead(mod, toSleepIn);
+                    if (_bedForSpawnPoint == null) {
+                        _bedForSpawnPoint = toSleepIn;
                     }
-                } else {
-                    _inBedTimer.reset();
-                }
-                if (closeEnough) {
-                    _inBedTimer.reset();
-                }
-                // Keep track of where our spawn point is
-                _progressChecker.reset();
-                return new InteractWithBlockTask(_bedForSpawnPoint);
-            }, ItemHelper.itemsToBlocks(ItemHelper.BED));
+                    if (!closeEnough) {
+                        try {
+                            Direction face = mod.getWorld().getBlockState(toSleepIn).get(BedBlock.FACING);
+                            Direction side = face.rotateYClockwise();
+                    /*
+                    BlockPos targetMove = toSleepIn.offset(side).offset(side); // Twice, juust to make sure...
+                     */
+                            return new GetToBlockTask(_bedForSpawnPoint.add(side.getVector()));
+                        } catch (IllegalArgumentException e) {
+                            // If bed is not loaded, this will happen. In that case just get to the bed first.
+                        }
+                    } else {
+                        _inBedTimer.reset();
+                    }
+                    if (closeEnough) {
+                        _inBedTimer.reset();
+                    }
+                    // Keep track of where our spawn point is
+                    _progressChecker.reset();
+                    return new InteractWithBlockTask(_bedForSpawnPoint);
+                }, bed);
+            }
         }
         if (_currentBedRegion != null) {
             for (Vec3i BedPlacePos : BED_PLACE_POS_OFFSET) {

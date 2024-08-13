@@ -46,7 +46,7 @@ public interface LookHelper {
         // Check if the side is null
         if (side == null) {
             // Calculate the reachable rotation from the player's position to the target position
-            reachableRotation = RotationUtils.reachable(context, target, context.playerController().getBlockReachDistance());
+            reachableRotation = RotationUtils.reachable(context, target);
         } else {
             // Calculate the center offset vector based on the side direction
             Vec3i sideVector = side.getVector();

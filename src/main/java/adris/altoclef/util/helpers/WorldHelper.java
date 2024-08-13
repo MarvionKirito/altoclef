@@ -3,7 +3,6 @@ package adris.altoclef.util.helpers;
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
 import adris.altoclef.mixins.ClientConnectionAccessor;
-import adris.altoclef.mixins.EntityAccessor;
 import adris.altoclef.util.Dimension;
 import baritone.api.BaritoneAPI;
 import baritone.pathing.movement.CalculationContext;
@@ -25,6 +24,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
+import net.minecraft.world.dimension.PortalManager;
 
 import java.util.*;
 
@@ -205,14 +205,12 @@ public interface WorldHelper {
     }
 
     static BlockPos getADesertTemple(AltoClef mod) {
-        List<BlockPos> stonePressurePlates = mod.getBlockTracker().getKnownLocations(Blocks.STONE_PRESSURE_PLATE);
-        if (!stonePressurePlates.isEmpty()) {
-            for (BlockPos pos : stonePressurePlates) {
-                if (mod.getWorld().getBlockState(pos).getBlock() == Blocks.STONE_PRESSURE_PLATE && // Duct tape
-                        mod.getWorld().getBlockState(pos.down()).getBlock() == Blocks.CUT_SANDSTONE &&
-                        mod.getWorld().getBlockState(pos.down(2)).getBlock() == Blocks.TNT) {
-                    return pos;
-                }
+        if (mod.getBlockTracker().isTracking(Blocks.STONE_PRESSURE_PLATE)) {
+            Optional<BlockPos> stonePressurePlates = mod.getBlockTracker().getNearestTracking(Blocks.STONE_PRESSURE_PLATE);
+            if (stonePressurePlates.isPresent() && mod.getWorld().getBlockState(stonePressurePlates.get()).getBlock() == Blocks.STONE_PRESSURE_PLATE && // Duct tape
+                    mod.getWorld().getBlockState(stonePressurePlates.get().down()).getBlock() == Blocks.CUT_SANDSTONE &&
+                    mod.getWorld().getBlockState(stonePressurePlates.get().down(2)).getBlock() == Blocks.TNT) {
+                return stonePressurePlates.get();
             }
         }
         return null;
@@ -240,7 +238,7 @@ public interface WorldHelper {
         boolean result = mod.getWorld().getBlockState(pos).getHardness(mod.getWorld(), pos) >= 0
                 && !mod.getExtraBaritoneSettings().shouldAvoidBreaking(pos)
                 && MineProcess.plausibleToBreak(new CalculationContext(mod.getClientBaritone()), pos)
-                && canReach(mod, pos);
+                && canReach(mod, pos) && !mod.getBlockTracker().unreachable(pos);
         mod.getExtraBaritoneSettings().setInteractionPaused(prevInteractionPaused);
         return result;
     }
@@ -248,7 +246,10 @@ public interface WorldHelper {
     static boolean isInNetherPortal(AltoClef mod) {
         if (mod.getPlayer() == null)
             return false;
-        return ((EntityAccessor) mod.getPlayer()).isInNetherPortal();
+        PortalManager portalManager = mod.getPlayer().portalManager;
+        if (portalManager == null)
+            return false;
+        return portalManager.isInPortal();
     }
 
     static boolean dangerousToBreakIfRightAbove(AltoClef mod, BlockPos toBreak) {

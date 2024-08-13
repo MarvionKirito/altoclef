@@ -11,8 +11,9 @@ import adris.altoclef.util.slots.PlayerSlot;
 import baritone.api.utils.input.Input;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -140,9 +141,7 @@ public class FoodChain extends SingleTaskChain {
                 !mod.getMLGBucketChain().isChorusFruiting() && !mod.getPlayer().isBlocking()) {
             Item toUse = _cachedPerfectFood.get();
             // Make sure we're not facing a container
-            if (!LookHelper.tryAvoidingInteractable(mod)) {
-                return Float.NEGATIVE_INFINITY;
-            }
+            LookHelper.tryAvoidingInteractable(mod);
             startEat(mod, toUse);
         } else {
             stopEat(mod);
@@ -216,7 +215,7 @@ public class FoodChain extends SingleTaskChain {
         if (foodLevel < _config.alwaysEatWhenBelowHungerAndPerfectFit && _cachedPerfectFood.isPresent()) {
             int need = 20 - foodLevel;
             Item best = _cachedPerfectFood.get();
-            int fills = (best.getFoodComponent() != null) ? best.getFoodComponent().getHunger() : -1;
+            int fills = (best.getComponents().get(DataComponentTypes.FOOD) != null) ? Objects.requireNonNull(best.getComponents().get(DataComponentTypes.FOOD)).nutrition() : -1;
             return fills == need;
         }
 
@@ -234,7 +233,7 @@ public class FoodChain extends SingleTaskChain {
         float saturation = player != null ? player.getHungerManager().getSaturationLevel() : 20;
         // Get best food item + calculate food total
         for (ItemStack stack : mod.getItemStorage().getItemStacksPlayerInventory(true)) {
-            if (stack.isFood()) {
+            if (stack.getItem().getComponents().contains(DataComponentTypes.FOOD)) {
                 // Ignore protected items
             	// if we ignore protected foods system gets stuck
             	// if (!ItemHelper.canThrowAwayStack(mod, stack)) continue;
@@ -244,17 +243,17 @@ public class FoodChain extends SingleTaskChain {
                     continue;
                 }
 
-                FoodComponent food = stack.getItem().getFoodComponent();
+                FoodComponent food = stack.getItem().getComponents().get(DataComponentTypes.FOOD);
 
                 assert food != null;
-                float hungerIfEaten = Math.min(hunger + food.getHunger(), 20);
-                float saturationIfEaten = Math.min(hungerIfEaten, saturation + food.getSaturationModifier());
+                float hungerIfEaten = Math.min(hunger + food.nutrition(), 20);
+                float saturationIfEaten = Math.min(hungerIfEaten, saturation + food.saturation());
                 float gainedSaturation = (saturationIfEaten - saturation);
                 float gainedHunger = (hungerIfEaten - hunger);
                 float hungerNotFilled = 20 - hungerIfEaten;
 
-                float saturationWasted = food.getSaturationModifier() - gainedSaturation;
-                float hungerWasted = food.getHunger() - gainedHunger;
+                float saturationWasted = food.saturation() - gainedSaturation;
+                float hungerWasted = food.nutrition() - gainedHunger;
 
                 boolean prioritizeSaturation = health < _config.prioritizeSaturationWhenBelowHealth;
                 float saturationGoodScore = prioritizeSaturation ? gainedSaturation * _config.foodPickPrioritizeSaturationSaturationMultiplier : gainedSaturation;
@@ -272,7 +271,7 @@ public class FoodChain extends SingleTaskChain {
                     bestFood = stack.getItem();
                 }
 
-                foodTotal += Objects.requireNonNull(stack.getItem().getFoodComponent()).getHunger() * stack.getCount();
+                foodTotal += Objects.requireNonNull(stack.getItem().getComponents().get(DataComponentTypes.FOOD)).nutrition() * stack.getCount();
             }
         }
 

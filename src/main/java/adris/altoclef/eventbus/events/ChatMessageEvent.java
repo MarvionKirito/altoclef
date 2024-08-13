@@ -26,6 +26,6 @@ public class ChatMessageEvent {
     }
 
     public MessageType messageType() {
-        return messageType.type();
+        return messageType.type().value();
     }
 }
