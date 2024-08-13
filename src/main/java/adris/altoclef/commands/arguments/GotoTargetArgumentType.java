@@ -23,6 +23,7 @@ import adris.altoclef.commandsystem.CommandException;
 import adris.altoclef.commandsystem.GotoTarget;
 import adris.altoclef.commandsystem.GotoTarget.GotoTargetCoordType;
 import adris.altoclef.util.Dimension;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
 
@@ -109,9 +110,9 @@ public class GotoTargetArgumentType implements ArgumentType<GotoTarget> {
 				matcher.find();
 
 				if (!matcher.hasMatch()) {
-					int x = AltoClef.mc.player.getBlockX();
-					int y = AltoClef.mc.player.getBlockY();
-					int z = AltoClef.mc.player.getBlockZ();
+					int x = MinecraftClient.getInstance().player.getBlockX();
+					int y = MinecraftClient.getInstance().player.getBlockY();
+					int z = MinecraftClient.getInstance().player.getBlockZ();
 					suggestions.add(x + " " + y + " " + z);
 		    		suggestions.add(x + " " + z);
 		    		suggestions.add(y + "");

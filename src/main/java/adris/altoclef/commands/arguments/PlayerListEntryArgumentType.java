@@ -12,11 +12,10 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;
-
-import static adris.altoclef.AltoClef.mc;
 
 public class PlayerListEntryArgumentType implements ArgumentType<PlayerListEntry> {
 	 private static final PlayerListEntryArgumentType INSTANCE = new PlayerListEntryArgumentType();
@@ -39,7 +38,7 @@ public class PlayerListEntryArgumentType implements ArgumentType<PlayerListEntry
 	        String argument = reader.readString();
 	        PlayerListEntry playerListEntry = null;
 
-	        for (PlayerListEntry p : mc.getNetworkHandler().getPlayerList()) {
+	        for (PlayerListEntry p : MinecraftClient.getInstance().getNetworkHandler().getPlayerList()) {
 	            if (p.getProfile().getName().equalsIgnoreCase(argument)) {
 	                playerListEntry = p;
 	                break;
@@ -52,7 +51,7 @@ public class PlayerListEntryArgumentType implements ArgumentType<PlayerListEntry
 
 	    @Override
 	    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-	        return CommandSource.suggestMatching(mc.getNetworkHandler().getPlayerList().stream().map(playerListEntry -> playerListEntry.getProfile().getName()), builder);
+	        return CommandSource.suggestMatching(MinecraftClient.getInstance().getNetworkHandler().getPlayerList().stream().map(playerListEntry -> playerListEntry.getProfile().getName()), builder);
 	    }
 
 	    @Override

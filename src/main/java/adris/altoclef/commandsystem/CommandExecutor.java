@@ -9,9 +9,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import adris.altoclef.AltoClef;
 import adris.altoclef.Debug;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
-
-import static adris.altoclef.AltoClef.mc;
 
 public class CommandExecutor {
 
@@ -81,7 +80,7 @@ public class CommandExecutor {
     
     
     public static void dispatch(String message) throws CommandSyntaxException {
-        DISPATCHER.execute(message, mc.getNetworkHandler().getCommandSource());
+        DISPATCHER.execute(message, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
     }
 
     public void execute(String line, Consumer<CommandException> getException) {

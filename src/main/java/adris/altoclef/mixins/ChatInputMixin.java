@@ -47,7 +47,6 @@ public abstract class ChatInputMixin extends ClientCommonNetworkHandler {
 	@Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void onSendChatMessage(String message, CallbackInfo ci) {
         if (ignoreChatMessage) return;
-
 		String prefix = ConfigHelper.getConfig(Settings.SETTINGS_PATH, Settings::new, Settings.class).getCommandPrefix();
         if (message.startsWith(prefix)) {
             try {

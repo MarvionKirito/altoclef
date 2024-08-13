@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.google.common.base.Strings;
@@ -64,14 +65,11 @@ public abstract class ChatInputSuggestorMixin {
     @Shadow
     protected abstract void showCommandSuggestions();
 
-	/**
-	 * @author VelizarBG
-	 * @reason Too niche to not overwrite
-	 */
-	@Overwrite
-	private List<Suggestion> sortSuggestions(Suggestions suggestions) {
+    @Inject(method = "sortSuggestions", at = @At("HEAD"), cancellable = true)
+	private List<Suggestion> sortSuggestions(Suggestions suggestions, CallbackInfoReturnable<List<Suggestion>> ci) {
 		String command = textField.getText().substring(0, textField.getCursor());
-			
+
+    	ci.cancel();
 		// To make sorting command literals work
 		if (command.startsWith("/") || command.startsWith("@"))
 			command = command.substring(1);
@@ -108,6 +106,7 @@ public abstract class ChatInputSuggestorMixin {
 		strictList.addAll(slightlyLooseList);
 		strictList.addAll(looseList);
 		strictList.addAll(veryLooseList);
+    	ci.setReturnValue(strictList);
 		return strictList;
 	}
 

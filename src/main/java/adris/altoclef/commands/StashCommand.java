@@ -1,7 +1,5 @@
 package adris.altoclef.commands;
 
-import static adris.altoclef.AltoClef.mc;
-
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import adris.altoclef.AltoClef;
@@ -13,6 +11,7 @@ import adris.altoclef.tasks.container.StoreInStashTask;
 import adris.altoclef.util.BlockRange;
 import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.helpers.WorldHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.Vec3ArgumentType;
@@ -30,8 +29,8 @@ public class StashCommand extends Command {
 				.then(argument("endPos", Vec3ArgumentType.vec3())
 				.then(argument("items", new ItemListArgumentType(REGISTRY_ACCESS))
 						.executes(context -> {
-							BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
-							BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+							BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(MinecraftClient.getInstance().player.getCommandSource());
+							BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(MinecraftClient.getInstance().player.getCommandSource());
 							ItemList itemList = ItemListArgumentType.get(context);
 							ItemTarget[] items = itemList.items;
 
@@ -43,8 +42,8 @@ public class StashCommand extends Command {
 		builder.then(argument("startPos", Vec3ArgumentType.vec3())
 				.then(argument("endPos", Vec3ArgumentType.vec3())
 				.executes(context -> {
-					BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
-					BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(mc.player.getCommandSource());
+					BlockPos startPos = context.getArgument("startPos", PosArgument.class).toAbsoluteBlockPos(MinecraftClient.getInstance().player.getCommandSource());
+					BlockPos endPos = context.getArgument("endPos", PosArgument.class).toAbsoluteBlockPos(MinecraftClient.getInstance().player.getCommandSource());
 					ItemTarget[] items = DepositCommand.getAllNonEquippedOrToolItemsAsTarget(_mod);
 
 
