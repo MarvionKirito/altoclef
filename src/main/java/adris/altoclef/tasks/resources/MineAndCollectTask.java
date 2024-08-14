@@ -22,6 +22,8 @@ import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.MiningRequirement;
 import adris.altoclef.util.helpers.BaritoneHelper;
 import adris.altoclef.util.helpers.ItemHelper;
+import adris.altoclef.util.helpers.OreSpawnDistributionHelper;
+import adris.altoclef.util.helpers.OreSpawnDistributionHelper.OreSpawnDistribution;
 import adris.altoclef.util.helpers.StorageHelper;
 import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.progresscheck.MovementProgressChecker;
@@ -465,34 +467,39 @@ public class MineAndCollectTask extends ResourceTask
 
 			if (mod.getClientBaritoneSettings().legitMine.value && _miningPos == null && _isOre)
 			{
-				OreDistribution oreDis = new OreDistribution(_blocks[0]);
+				Optional<OreSpawnDistribution> oreSpawnDistribution = OreSpawnDistributionHelper.getOreDistributionFor(_blocks);
+				if (oreSpawnDistribution.isEmpty()) {
+				    mod.logWarning("Ore spawn distribution not specified for any of the blocks bot attempted to mine for.");
+				    mod.getTaskRunner().disable();
+				    return null;
+				}
 				// int groundHeight = WorldHelper.getGroundHeight(mod,
 				// mod.getPlayer().getBlockX(), mod.getPlayer().getBlockZ());
 				int groundHeight = 64;
 				if (_searchTask instanceof GetToYTask && !(_searchTask.isActive() && !_searchTask.isFinished(mod))
 						|| !(_searchTask instanceof GetToYTask))
 				{
-					if (groundHeight < oreDis.maxHeight && mod.getPlayer().getY() > groundHeight)
+					if (groundHeight < oreSpawnDistribution.get().getMaxHeight() && mod.getPlayer().getY() > groundHeight)
 					{
-						_searchTask = new GetToYTask(oreDis.minHeight);
-					} else if (groundHeight > oreDis.optimalHeight && (mod.getPlayer().getY() < oreDis.minHeight - 20
-							|| mod.getPlayer().getY() > oreDis.maxHeight + 20))
+						_searchTask = new GetToYTask(oreSpawnDistribution.get().getMinHeight());
+					} else if (groundHeight > oreSpawnDistribution.get().getOptimalHeight() && (mod.getPlayer().getY() < oreSpawnDistribution.get().getMinHeight() - 20
+							|| mod.getPlayer().getY() > oreSpawnDistribution.get().getMaxHeight() + 20))
 					{
-						_searchTask = new GetToYTask(oreDis.optimalHeight);
+						_searchTask = new GetToYTask(oreSpawnDistribution.get().getOptimalHeight());
 					}
 
 					else if (_searchTask instanceof TimeoutWanderTask && !_searchProgressChecker.check(mod))
 					{
-						if (groundHeight > oreDis.optimalHeight)
+						if (groundHeight > oreSpawnDistribution.get().getOptimalHeight())
 						{
 							_searchTask = new BranchMiningTask(
-									new BlockPos(mod.getPlayer().getBlockPos().getX(), oreDis.optimalHeight,
+									new BlockPos(mod.getPlayer().getBlockPos().getX(), oreSpawnDistribution.get().getOptimalHeight(),
 											mod.getPlayer().getBlockPos().getZ()),
 									mod.getPlayer().getMovementDirection(), Arrays.asList(_blocks));
 						} else
 						{
 							_searchTask = new BranchMiningTask(
-									new BlockPos(mod.getPlayer().getBlockPos().getX(), oreDis.minHeight + 25,
+									new BlockPos(mod.getPlayer().getBlockPos().getX(), oreSpawnDistribution.get().getMinHeight() + 25,
 											mod.getPlayer().getBlockPos().getZ()),
 									mod.getPlayer().getMovementDirection(), Arrays.asList(_blocks));
 						}
@@ -505,14 +512,14 @@ public class MineAndCollectTask extends ResourceTask
 					}
 				}
 
-				if (groundHeight > oreDis.optimalHeight)
+				if (groundHeight > oreSpawnDistribution.get().getOptimalHeight())
 				{
-					mod.getClientBaritoneSettings().exploreMaintainY.value = oreDis.optimalHeight == -59
-							? oreDis.optimalHeight
-							: oreDis.optimalHeight - 20;
+					mod.getClientBaritoneSettings().exploreMaintainY.value = oreSpawnDistribution.get().getOptimalHeight() == -59
+							? oreSpawnDistribution.get().getOptimalHeight()
+							: oreSpawnDistribution.get().getOptimalHeight() - 20;
 				} else
 				{
-					mod.getClientBaritoneSettings().exploreMaintainY.value = oreDis.minHeight + 20;
+					mod.getClientBaritoneSettings().exploreMaintainY.value = oreSpawnDistribution.get().getMinHeight() + 20;
 				}
 
 				return _searchTask;
@@ -674,59 +681,4 @@ public class MineAndCollectTask extends ResourceTask
 
 	}
 
-}
-
-class OreDistribution
-{
-
-	public final int maxHeight;
-	public final int optimalHeight;
-	public final int minHeight;
-
-	OreDistribution(Block block)
-	{
-
-		if (block == Blocks.COAL_ORE || block == Blocks.DEEPSLATE_COAL_ORE)
-		{
-			maxHeight = 192;
-			optimalHeight = 96;
-			minHeight = 0;
-		} else if (block == Blocks.COPPER_ORE || block == Blocks.DEEPSLATE_COPPER_ORE)
-		{
-			maxHeight = 112;
-			optimalHeight = 48;
-			minHeight = -16;
-		} else if (block == Blocks.IRON_ORE || block == Blocks.DEEPSLATE_IRON_ORE)
-		{
-			maxHeight = 72;
-			optimalHeight = 16;
-			minHeight = -32;
-		} else if (block == Blocks.LAPIS_ORE || block == Blocks.DEEPSLATE_LAPIS_ORE)
-		{
-			maxHeight = 64;
-			optimalHeight = 0;
-			minHeight = -59;
-		} else if (block == Blocks.GOLD_ORE || block == Blocks.DEEPSLATE_GOLD_ORE)
-		{
-			maxHeight = 32;
-			optimalHeight = -16;
-			minHeight = -59;
-		} else if (block == Blocks.DIAMOND_ORE || block == Blocks.DEEPSLATE_DIAMOND_ORE)
-		{
-			maxHeight = 15;
-			optimalHeight = -59;
-			minHeight = -59;
-		} else if (block == Blocks.REDSTONE_ORE || block == Blocks.DEEPSLATE_REDSTONE_ORE)
-		{
-			maxHeight = 15;
-			optimalHeight = -59;
-			minHeight = -59;
-		} else
-		{
-			maxHeight = 8;
-			optimalHeight = 8;
-			minHeight = 8;
-		}
-//    	throw new IllegalArgumentException("Unexpected value: " + block);
-	}
 }
