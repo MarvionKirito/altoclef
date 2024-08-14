@@ -73,6 +73,17 @@ public class Settings implements IFailableConfigFile {
      * If true, will show a timer.
      */
     private boolean showTimer = false;
+    
+
+    /**
+     * If true, will spread items through crafting grid.
+     */
+    private boolean spreadItemsToCraft = false;
+    
+    /*
+     * If true open inventory during crafting in 2x2
+     */
+    private boolean openInventoryDuringCrafting = true;
 
     /**
      * The delay between moving items for crafting/furnace/any kind of inventory movement.
@@ -258,6 +269,13 @@ public class Settings implements IFailableConfigFile {
      */
     private boolean autoRespawn = true;
 
+    /**
+     * If true, will automatically avoid all blocks that are close to hostile mobs.
+     * <p>
+     * If disabled, the bot will ignore hostile mobs.
+     */
+    private boolean blacklistDangerousBlocks = true;
+    
     /**
      * This setting lets you configure what the bot should do if it needs to go to the nether
      * but can't find a nether portal immediately.
@@ -455,6 +473,14 @@ public class Settings implements IFailableConfigFile {
     public boolean shouldShowTimer() {
         return showTimer;
     }
+    
+    public boolean shouldSpreadItemsToCraft( ) {
+    	return spreadItemsToCraft;
+    }
+    
+	public boolean shouldOpenInventoryDuringCrafting() {
+		return openInventoryDuringCrafting;
+	}
 
     public float getResourcePickupRange() {
         return resourcePickupDropRange;
@@ -502,6 +528,10 @@ public class Settings implements IFailableConfigFile {
 
     public boolean isAutoRespawn() {
         return autoRespawn;
+    }
+    
+    public boolean shouldBlacklistDangerousBlocks() {
+    	return blacklistDangerousBlocks;
     }
 
     public boolean shouldReplantCrops() {

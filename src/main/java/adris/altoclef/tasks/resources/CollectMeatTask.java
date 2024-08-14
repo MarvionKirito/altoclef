@@ -12,6 +12,7 @@ import adris.altoclef.util.ItemTarget;
 import adris.altoclef.util.SmeltTarget;
 import adris.altoclef.util.helpers.ItemHelper;
 import adris.altoclef.util.helpers.StorageHelper;
+import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.slots.SmokerSlot;
 import adris.altoclef.util.time.TimerGame;
 import net.minecraft.client.MinecraftClient;
@@ -193,7 +194,7 @@ public class CollectMeatTask extends Task {
     private Task pickupTaskOrNull(AltoClef mod, Item itemToGrab, double maxRange) {
         Optional<ItemEntity> nearestDrop = Optional.empty();
         if (mod.getEntityTracker().itemDropped(itemToGrab)) {
-            nearestDrop = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), itemToGrab);
+            nearestDrop = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), entity -> !WorldHelper.isDangerous(mod, entity.getBlockPos()), itemToGrab);
         }
         if (nearestDrop.isPresent()) {
             if (nearestDrop.get().isInRange(mod.getPlayer(), maxRange)) {

@@ -4,6 +4,7 @@ import adris.altoclef.AltoClef;
 import adris.altoclef.util.helpers.LookHelper;
 import adris.altoclef.util.helpers.StlHelper;
 import adris.altoclef.util.helpers.StorageHelper;
+import adris.altoclef.util.helpers.WorldHelper;
 import adris.altoclef.util.slots.PlayerSlot;
 import adris.altoclef.util.slots.Slot;
 import adris.altoclef.util.time.TimerGame;
@@ -19,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +75,8 @@ public class KillAura {
 
     public void tickEnd(AltoClef mod) {
         Optional<Entity> entities = _targets.stream().min(StlHelper.compareValues(entity -> entity.squaredDistanceTo(mod.getPlayer())));
-        if (entities.isPresent() && mod.getPlayer().getHealth() >= 10 &&
-                !mod.getEntityTracker().entityFound(PotionEntity.class) && !mod.getFoodChain().needsToEat() &&
+        if (entities.isPresent() &&
+                !mod.getEntityTracker().entityFound(PotionEntity.class) &&
                 (Double.isInfinite(_forceFieldRange) || entities.get().squaredDistanceTo(mod.getPlayer()) < _forceFieldRange * _forceFieldRange ||
                         entities.get().squaredDistanceTo(mod.getPlayer()) < 40) &&
                 !mod.getMLGBucketChain().isFallingOhNo(mod) && mod.getMLGBucketChain().doneMLG() &&
@@ -91,7 +93,7 @@ public class KillAura {
                 ItemStack shieldSlot = StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT);
                 if (shieldSlot.getItem() != Items.SHIELD) {
                     mod.getSlotHandler().forceEquipItemToOffhand(Items.SHIELD);
-                } else {
+                } else if(!WorldHelper.isSurroundedByHostiles(mod)) {
                     startShielding(mod);
                 }
             }
@@ -175,7 +177,10 @@ public class KillAura {
     private void attack(AltoClef mod, Entity entity, boolean equipSword) {
         if (entity == null) return;
         if (!(entity instanceof FireballEntity)) {
-            LookHelper.lookAt(mod, entity.getEyePos());
+        	double xAim = entity.getX();
+			double yAim = entity.getY() + (entity.getHeight() / 1.4);
+			double zAim = entity.getZ();
+            LookHelper.lookAt(mod, new Vec3d(xAim, yAim, zAim));
         }
         if (Double.isInfinite(_forceFieldRange) || entity.squaredDistanceTo(mod.getPlayer()) < _forceFieldRange * _forceFieldRange ||
                 entity.squaredDistanceTo(mod.getPlayer()) < 40) {
@@ -200,8 +205,6 @@ public class KillAura {
 
     public void startShielding(AltoClef mod) {
         _shielding = true;
-        mod.getInputControls().hold(Input.SNEAK);
-        mod.getInputControls().hold(Input.CLICK_RIGHT);
         mod.getClientBaritone().getPathingBehavior().requestPause();
         mod.getExtraBaritoneSettings().setInteractionPaused(true);
         if (!mod.getPlayer().isBlocking()) {
@@ -220,6 +223,8 @@ public class KillAura {
                 garbage.ifPresent(slot -> mod.getSlotHandler().forceEquipItem(StorageHelper.getItemStackInSlot(slot).getItem()));
             }
         }
+        mod.getInputControls().hold(Input.SNEAK);
+        mod.getInputControls().hold(Input.CLICK_RIGHT);
     }
 
     public void stopShielding(AltoClef mod) {
@@ -239,6 +244,11 @@ public class KillAura {
             _shielding = false;
         }
     }
+    
+    public boolean isShielding()
+	{
+		return _shielding;
+	}
 
     public enum Strategy {
         OFF,

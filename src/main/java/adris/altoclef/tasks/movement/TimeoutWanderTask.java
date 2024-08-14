@@ -235,6 +235,22 @@ public class TimeoutWanderTask extends Task implements ITaskRequiresGrounded {
                 Debug.logMessage("Failed exploring.");
             }
         }
+        // We are getting a little worried. Lets try more options...
+        if (_failCounter > 5 && _failCounter < 10 || _forceExplore) {
+            mod.getBehaviour().setBlockBreakAdditionalPenalty(0.2);
+            mod.getClientBaritoneSettings().blockBreakAdditionalPenalty.value = 0.2;
+            mod.getBehaviour().setBlockPlacePenalty(15.0);
+            mod.getClientBaritoneSettings().blockPlacementPenalty.value = 15.0;
+            mod.getClientBaritoneSettings().costHeuristic.value = 6.5;
+        }
+        // Now we are getting desperate get where ever and however you can...
+        if (_failCounter > 10 && _failCounter <= 20) {
+            mod.getBehaviour().setBlockBreakAdditionalPenalty(0.0);
+            mod.getClientBaritoneSettings().blockBreakAdditionalPenalty.value = 0.0;
+            mod.getBehaviour().setBlockPlacePenalty(0.0);
+            mod.getClientBaritoneSettings().blockPlacementPenalty.value = 0.0;
+            mod.getClientBaritoneSettings().costHeuristic.value = 400.5;
+        }
         return null;
     }
 

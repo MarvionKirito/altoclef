@@ -1,6 +1,7 @@
 package adris.altoclef.trackers.storage;
 
 import adris.altoclef.AltoClef;
+import adris.altoclef.Debug;
 import adris.altoclef.trackers.Tracker;
 import adris.altoclef.trackers.TrackerManager;
 import adris.altoclef.util.ItemTarget;
@@ -178,11 +179,16 @@ public class ItemStorageTracker extends Tracker {
     public List<Slot> getSlotsThatCanFitInPlayerInventory(ItemStack stack, boolean acceptPartial) {
         return _inventory.getSlotsThatCanFit(true, false, stack, acceptPartial);
     }
-
+    
     public Optional<Slot> getSlotThatCanFitInPlayerInventory(ItemStack stack, boolean acceptPartial) {
+    	return getSlotThatCanFitInPlayerInventory(stack, acceptPartial, true);
+    }
+
+    public Optional<Slot> getSlotThatCanFitInPlayerInventory(ItemStack stack, boolean acceptPartial, boolean acceptCraftingGrid) {
         List<Slot> slots = getSlotsThatCanFitInPlayerInventory(stack, acceptPartial);
         if (!slots.isEmpty()) {
             for (Slot slot : slots) {
+            	if (!acceptCraftingGrid && (slot.getInventorySlot() >= 9 || slot.getInventorySlot() <= 0)) continue;
                 return Optional.ofNullable(slot);
             }
         }

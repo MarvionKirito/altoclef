@@ -158,13 +158,20 @@ public class SmeltInFurnaceTask extends ResourceTask {
         protected boolean isContainerOpen(AltoClef mod) {
             return (mod.getPlayer().currentScreenHandler instanceof FurnaceScreenHandler);
         }
+        
 
         @Override
-        protected Task onTick(AltoClef mod) {
+        protected void onStart(AltoClef mod) {
+            super.onStart(mod);
+
             mod.getBehaviour().addProtectedItems(ItemHelper.PLANKS);
             mod.getBehaviour().addProtectedItems(Items.COAL);
             mod.getBehaviour().addProtectedItems(_allMaterials.getMatches());
             mod.getBehaviour().addProtectedItems(_target.getMaterial().getMatches());
+        }
+
+        @Override
+        protected Task onTick(AltoClef mod) {
             tryUpdateOpenFurnace(mod);
             // Include both regular + optional items
             ItemTarget materialTarget = _allMaterials;
@@ -333,8 +340,10 @@ public class SmeltInFurnaceTask extends ResourceTask {
         @Override
         protected double getCostToMakeNew(AltoClef mod) {
             if (_furnaceCache.burnPercentage > 0 || _furnaceCache.burningFuelCount > 0 ||
-                    _furnaceCache.fuelSlot != null || _furnaceCache.materialSlot != null ||
-                    _furnaceCache.outputSlot != null) {
+                _furnaceCache.fuelSlot != null || _furnaceCache.materialSlot != null ||
+                _furnaceCache.outputSlot != null||
+                !_furnaceCache.fuelSlot.isEmpty() || !_furnaceCache.materialSlot.isEmpty() ||
+                !_furnaceCache.outputSlot.isEmpty()) {
                 return 9999999.0;
             }
             if (mod.getItemStorage().getItemCount(Items.COBBLESTONE) > 8) {

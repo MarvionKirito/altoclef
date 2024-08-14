@@ -27,6 +27,16 @@ public class CollectFuelTask extends Task {
 
         switch (WorldHelper.getCurrentDimension()) {
             case OVERWORLD -> {
+            	if(!mod.getModSettings().shouldLimitFuelsToSupportedFuels()
+        			&& (WorldHelper.isVulnurable(mod) 
+        			|| !(mod.getItemStorage().hasItemInOffhand(Items.SHIELD)
+					&& mod.getItemStorage().hasItemInOffhand(Items.SHIELD)) 
+        			&& !mod.getModSettings().shouldLimitFuelsToSupportedFuels()))
+            	{
+            		// We cant go to mine as we are vulnerable so lets collect planks
+                    setDebugState("Collecting planks.");
+                    return TaskCatalogue.getItemTask("planks", (int) Math.ceil(_targetFuel / 1.5));
+            	}
                 // Just collect coal for now.
                 setDebugState("Collecting coal.");
                 return TaskCatalogue.getItemTask(Items.COAL, (int) Math.ceil(_targetFuel / 8));

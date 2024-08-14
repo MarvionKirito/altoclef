@@ -90,7 +90,7 @@ public class CollectCropTask extends ResourceTask {
                 return _collectSeedTask;
             }
             if (mod.getEntityTracker().itemDropped(_cropSeed)) {
-                Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), _cropSeed);
+                Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), entity -> !WorldHelper.isDangerous(mod, entity.getBlockPos()), _cropSeed);
                 if (closest.isPresent() && closest.get().isInRange(mod.getPlayer(), 7)) {
                     // Trigger the collection of seeds.
                     return _collectSeedTask;

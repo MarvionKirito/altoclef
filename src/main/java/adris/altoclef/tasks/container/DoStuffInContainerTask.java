@@ -141,6 +141,7 @@ public abstract class DoStuffInContainerTask extends Task {
 
         if (!StorageHelper.getItemStackInCursorSlot().isEmpty()) {
             Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(StorageHelper.getItemStackInCursorSlot(), false);
+            
             if (toMoveTo.isEmpty()) {
                 return new EnsureFreeInventorySlotTask();
             }

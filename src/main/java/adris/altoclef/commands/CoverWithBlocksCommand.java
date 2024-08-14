@@ -1,18 +1,24 @@
 package adris.altoclef.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+
 import adris.altoclef.AltoClef;
-import adris.altoclef.commandsystem.ArgParser;
 import adris.altoclef.commandsystem.Command;
-import adris.altoclef.commandsystem.CommandException;
 import adris.altoclef.tasks.construction.CoverWithBlocksTask;
+import net.minecraft.command.CommandSource;
 
 public class CoverWithBlocksCommand extends Command {
-    public CoverWithBlocksCommand() {
-        super("coverwithblocks", "Cover nether lava with blocks");
+    public CoverWithBlocksCommand(AltoClef mod) {
+        super("coverwithblocks", "Cover nether lava with blocks", mod);
     }
 
-    @Override
-    protected void call(AltoClef mod, ArgParser parser) throws CommandException {
-        mod.runUserTask(new CoverWithBlocksTask(), this::finish);
-    }
+	@Override
+	public void build(LiteralArgumentBuilder<CommandSource> builder) {
+		builder.executes(context -> {
+			_mod.runUserTask(new CoverWithBlocksTask(), this::finish);
+			
+			return SINGLE_SUCCESS;
+		});
+		
+	}
 }

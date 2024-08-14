@@ -80,6 +80,7 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
     protected void onStart(AltoClef mod) {
         mod.getBehaviour().push();
         //removeThrowawayItems(_itemTargets);
+        mod.getBehaviour().addProtectedItems(ItemTarget.getMatches(_itemTargets));
         if (_mineIfPresent != null) {
             mod.getBlockTracker().trackBlock(_mineIfPresent);
         }
@@ -88,7 +89,6 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
 
     @Override
     protected Task onTick(AltoClef mod) {
-        mod.getBehaviour().addProtectedItems(ItemTarget.getMatches(_itemTargets));
         // If we have an item in an INACCESSIBLE inventory slot
         if (!(thisOrChildSatisfies(task -> task instanceof ITaskUsesCraftingGrid)) || _ensureFreeCraftingGridTask.isActive()) {
             for (ItemTarget target : _itemTargets) {
@@ -132,14 +132,14 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
                         return _pickupTask;
                     }
                     // Only get items that are CLOSE to us.
-                    Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), _itemTargets);
+                    Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), entity -> !WorldHelper.isDangerous(mod, entity.getBlockPos()), _itemTargets);
                     if (closest.isPresent() && !closest.get().isInRange(mod.getPlayer(), 10)) {
                         return onResourceTick(mod);
                     }
                 }
 
                 double range = mod.getModSettings().getResourcePickupRange();
-                Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), _itemTargets);
+                Optional<ItemEntity> closest = mod.getEntityTracker().getClosestItemDrop(mod.getPlayer().getPos(), entity -> !WorldHelper.isDangerous(mod, entity.getBlockPos()), _itemTargets);
                 if (range < 0 || (closest.isPresent() && closest.get().isInRange(mod.getPlayer(), range)) || (_pickupTask.isActive() && !_pickupTask.isFinished(mod))) {
                     setDebugState("Picking up");
                     return _pickupTask;
@@ -192,7 +192,7 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
         }
         // Make sure that items don't get stuck in the player crafting grid. May be an issue if a future task isn't a resource task.
         if (StorageHelper.isPlayerInventoryOpen()) {
-            if (!(thisOrChildSatisfies(task -> task instanceof ITaskUsesCraftingGrid)) || _ensureFreeCraftingGridTask.isActive()) {
+            if ((thisOrChildSatisfies(task -> task instanceof ITaskUsesCraftingGrid && !task.isActive())) || _ensureFreeCraftingGridTask.isActive()) {
                 for (Slot slot : PlayerSlot.CRAFT_INPUT_SLOTS) {
                     if (!StorageHelper.getItemStackInSlot(slot).isEmpty()) {
                         return _ensureFreeCraftingGridTask;

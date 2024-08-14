@@ -1,14 +1,20 @@
 package adris.altoclef.commandsystem;
 
-import adris.altoclef.AltoClef;
-import adris.altoclef.Debug;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import adris.altoclef.AltoClef;
+import adris.altoclef.Debug;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.CommandSource;
+
 public class CommandExecutor {
 
+	public static final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
     private final HashMap<String, Command> _commandSheet = new HashMap<>();
     private final AltoClef _mod;
 
@@ -22,6 +28,7 @@ public class CommandExecutor {
                 Debug.logInternal("Command with name " + command.getName() + " already exists! Can't register that name twice.");
                 continue;
             }
+            command.registerTo(DISPATCHER);
             _commandSheet.put(command.getName(), command);
         }
     }
@@ -35,7 +42,7 @@ public class CommandExecutor {
     }
 
     // This is how we "nest" command finishes so we can complete them in order.
-    private void executeRecursive(Command[] commands, String[] parts, int index, Runnable onFinish, Consumer<CommandException> getException) {
+    public void executeRecursive(Command[] commands, String[] parts, int index, Runnable onFinish, Consumer<CommandException> getException) {
         if (index >= commands.length) {
             onFinish.run();
             return;
@@ -47,10 +54,10 @@ public class CommandExecutor {
                 getException.accept(new CommandException("Invalid command:" + part));
                 executeRecursive(commands, parts, index + 1, onFinish, getException);
             } else {
-                command.run(_mod, part, () -> executeRecursive(commands, parts, index + 1, onFinish, getException));
+                command.run(_mod, part.contains("@") ? part.split("@")[1] : part, () -> executeRecursive(commands, parts, index + 1, onFinish, getException));
             }
         } catch (CommandException ae) {
-            getException.accept(new CommandException(ae.getMessage() + "\nUsage: " + command.getHelpRepresentation(), ae));
+//            getException.accept(new CommandException(ae.getMessage() + "\nUsage: " + command.getHelpRepresentation(), ae));
         }
     }
 
@@ -68,6 +75,12 @@ public class CommandExecutor {
             getException.accept(e);
         }
         executeRecursive(commands, parts, 0, onFinish, getException);
+    }
+    
+    
+    
+    public static void dispatch(String message) throws CommandSyntaxException {
+        DISPATCHER.execute(message, MinecraftClient.getInstance().getNetworkHandler().getCommandSource());
     }
 
     public void execute(String line, Consumer<CommandException> getException) {

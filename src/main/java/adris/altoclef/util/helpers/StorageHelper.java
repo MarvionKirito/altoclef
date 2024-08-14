@@ -301,7 +301,53 @@ public class StorageHelper {
         }
         return Optional.empty();
     }
+    
+    public static int getNumberOfThrowawayBlocks(AltoClef mod) {
+        int totalBlockThrowaways = 0;
+        if (!mod.getItemStorage().getSlotsWithItemPlayerInventory(false, mod.getModSettings().getThrowawayItems(mod)).isEmpty()) {
+            for (Slot slot : mod.getItemStorage().getSlotsWithItemPlayerInventory(false, mod.getModSettings().getThrowawayItems(mod))) {
+                // Our cursor slot is NOT a garbage slot
+                ItemStack stack = StorageHelper.getItemStackInSlot(slot);
+                if (!ItemHelper.canThrowAwayStack(mod, stack))
+                    continue;
+                if (stack.getItem() instanceof BlockItem) {
+                    totalBlockThrowaways += stack.getCount();
+                }
+            }
+        }
+        return totalBlockThrowaways;
+    }
 
+    public static Optional<Slot> getSlotWithThrowawayBlock(AltoClef mod) {
+    	return getSlotWithThrowawayBlock(mod, false);
+    }
+    public static Optional<Slot> getSlotWithThrowawayBlock(AltoClef mod, boolean limitToHotbar) {
+    	final List<Slot> throwawayBlockItems = new ArrayList<>();
+        int totalBlockThrowaways = 0;
+        if (!mod.getItemStorage().getSlotsWithItemPlayerInventory(false, mod.getModSettings().getThrowawayItems(mod)).isEmpty()) {
+            for (Slot slot : mod.getItemStorage().getSlotsWithItemPlayerInventory(false, mod.getModSettings().getThrowawayItems(mod))) {
+                // Our cursor slot is NOT a garbage slot
+                if (Slot.isCursor(slot))
+                    continue;
+                if(limitToHotbar && (slot.getInventorySlot() > 8 || slot.getInventorySlot() < 0))
+                	continue;
+                ItemStack stack = StorageHelper.getItemStackInSlot(slot);
+                if (!ItemHelper.canThrowAwayStack(mod, stack))
+                    continue;
+                if (stack.getItem() instanceof BlockItem) {
+                    totalBlockThrowaways += stack.getCount();
+                    throwawayBlockItems.add(slot);
+                }
+            }
+        }
+        if (!throwawayBlockItems.isEmpty()) {
+            for (Slot throwawayBlockItem : throwawayBlockItems) {
+                return Optional.ofNullable(throwawayBlockItem);
+            }
+        }
+        return Optional.empty();
+    }
+    
     /**
      * @return whether EVERY item target in {@code targetsToMeet} is met in our inventory or conversion slots.
      */

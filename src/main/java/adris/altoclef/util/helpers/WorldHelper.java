@@ -1,6 +1,7 @@
 package adris.altoclef.util.helpers;
 
 import adris.altoclef.AltoClef;
+import adris.altoclef.Debug;
 import adris.altoclef.mixins.ClientConnectionAccessor;
 import adris.altoclef.util.Dimension;
 import baritone.api.BaritoneAPI;
@@ -16,6 +17,7 @@ import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.*;
@@ -114,6 +116,30 @@ public interface WorldHelper {
 
     static boolean isSolid(AltoClef mod, BlockPos pos) {
         return mod.getWorld().getBlockState(pos).isSolidBlock(mod.getWorld(), pos);
+    }
+    
+    static boolean isVulnurable(AltoClef mod) {
+        int armor = mod.getPlayer().getArmor();
+        float health = mod.getPlayer().getHealth();
+        if (armor <= 15 && health < 3) return true;
+        if (armor < 10 && health < 10) return true;
+        return armor < 5 && health < 18;
+    }
+    
+    static boolean isDangerous(AltoClef mod, BlockPos pos) {
+        Iterable<Entity> entities = mod.getWorld().getEntities();
+        for (Entity entity : entities) {
+            if (entity instanceof HostileEntity) {
+                if (!mod.getBlockTracker().unreachable(pos)) {
+                    if (
+                    		mod.getPlayer().squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) > 4 &&
+                    		pos.isWithinDistance(entity.getPos(), 30)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    	return false;
     }
 
     /**
@@ -413,5 +439,72 @@ public interface WorldHelper {
         }
         // https://minecraft.fandom.com/wiki/Daylight_cycle
         return 12542 <= time && time <= 23992;
+    }
+    
+    public static boolean isSurroundedByHostiles(AltoClef mod) {
+    	List<Entity> hostiles = mod.getEntityTracker().getHostiles();
+    	return isSurrounded(mod, hostiles);
+    }
+    
+    // Function to check if the player is surrounded on two or more sides
+    public static boolean isSurrounded(AltoClef mod, List<Entity> entities) {
+    	
+    	BlockPos playerPos = mod.getPlayer().getBlockPos();
+    	
+        // Minimum number of sides to consider the origin surrounded
+        final int MIN_SIDES_TO_SURROUND = 2;
+
+        // Count the number of unique sides based on angles
+        List<Direction> uniqueSides =  new ArrayList<Direction>();
+
+        // Iterate through each point and calculate the angle with the origin
+        for (Entity entity : entities) {
+        	if(!entity.isInRange(mod.getPlayer(), 8)) continue;
+        	BlockPos entityPos = entity.getBlockPos();
+            double angle = calculateAngle(playerPos, entityPos);
+
+            // Check if the angle is unique
+            boolean isUnique = true;
+            if (uniqueSides.contains(getHorizontalDirectionFromYaw(angle))) {
+            	isUnique = false;
+            }
+
+            // If the angle is unique, increment the uniqueSides count
+            if (isUnique) {
+            	uniqueSides.add(getHorizontalDirectionFromYaw(angle));
+            }
+        }
+
+        // Check if the origin is surrounded on two or more sides
+        return uniqueSides.size() >= MIN_SIDES_TO_SURROUND;
+    }
+    
+    private static double calculateAngle(BlockPos origin, BlockPos target) {
+        double translatedX = target.getX() - origin.getX();
+        double translatedZ = target.getZ() - origin.getZ();
+        double angleRad = Math.atan2(translatedZ, translatedX);
+        double angleDeg = Math.toDegrees(angleRad);
+        angleDeg -= 90;
+        if (angleDeg < 0) {
+            angleDeg += 360;
+        }
+        return angleDeg;
+    }
+    
+    private static Direction getHorizontalDirectionFromYaw(double yaw) {
+        yaw %= 360.0F;
+        if (yaw < 0) {
+            yaw += 360.0F;
+        }
+
+        if ((yaw >= 45 && yaw < 135) || (yaw >= -315 && yaw < -225)) {
+            return Direction.WEST;
+        } else if ((yaw >= 135 && yaw < 225) || (yaw >= -225 && yaw < -135)) {
+            return Direction.NORTH;
+        } else if ((yaw >= 225 && yaw < 315) || (yaw >= -135 && yaw < -45)) {
+            return Direction.EAST;
+        } else {
+            return Direction.SOUTH;
+        }
     }
 }

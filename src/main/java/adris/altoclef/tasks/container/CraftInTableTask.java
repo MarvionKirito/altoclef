@@ -1,5 +1,11 @@
 package adris.altoclef.tasks.container;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import adris.altoclef.AltoClef;
 import adris.altoclef.tasks.CraftGenericManuallyTask;
 import adris.altoclef.tasks.CraftGenericWithRecipeBooksTask;
@@ -27,8 +33,6 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.*;
 
 /**
  * Crafts an item in a crafting table, obtaining and placing the table down if none was found.
@@ -241,6 +245,9 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
 
         // Reset the collect task
         _collectTask.reset();
+        
+        // Add protected items to the behaviour
+        mod.getBehaviour().addProtectedItems(getMaterialsArray());
     }
 
     /**
@@ -295,8 +302,6 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
      */
     @Override
     protected Task onTick(AltoClef mod) {
-        // Add protected items to the behaviour
-        mod.getBehaviour().addProtectedItems(getMaterialsArray());
 
         // Avoid breaking crafting tables
         if (mod.getBlockTracker().isTracking(Blocks.CRAFTING_TABLE)) {
@@ -377,11 +382,21 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
      */
     @Override
     protected Task containerSubTask(AltoClef mod) {
+        // Refresh crafting table Juuust in case
+        float CRAFT_RESET_TIMER_SECONDS = 0;
+        for (RecipeTarget recipeTarget : _targets) {
+	        for(ItemTarget recipeItemTarget: recipeTarget.getRecipe().getSlots()) {
+	            if(recipeItemTarget.getCatalogueName() != "null")
+	            	CRAFT_RESET_TIMER_SECONDS += recipeItemTarget.getTargetCount() * recipeTarget.getTargetCount() * (mod.getModSettings().getContainerItemMoveDelay() * 10);
+	        }
+        }
+        _craftResetTimer.setInterval(CRAFT_RESET_TIMER_SECONDS + mod.getModSettings().getContainerItemMoveDelay() * 10 + CRAFT_RESET_TIMER_BONUS_SECONDS);
         // Calculate the interval based on the container item move delay and a bonus duration
         float interval = mod.getModSettings().getContainerItemMoveDelay() * 10 + CRAFT_RESET_TIMER_BONUS_SECONDS;
         _craftResetTimer.setInterval(interval);
 
         // If the craft reset timer has elapsed, return a TimeoutWanderTask
+
         if (_craftResetTimer.elapsed()) {
             return new TimeoutWanderTask(5);
         }

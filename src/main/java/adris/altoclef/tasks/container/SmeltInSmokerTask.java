@@ -162,12 +162,19 @@ public class SmeltInSmokerTask extends ResourceTask {
             return (mod.getPlayer().currentScreenHandler instanceof SmokerScreenHandler);
         }
 
+
         @Override
-        protected Task onTick(AltoClef mod) {
+        protected void onStart(AltoClef mod) {
+            super.onStart(mod);
+
             mod.getBehaviour().addProtectedItems(ItemHelper.PLANKS);
             mod.getBehaviour().addProtectedItems(Items.COAL);
             mod.getBehaviour().addProtectedItems(_allMaterials.getMatches());
             mod.getBehaviour().addProtectedItems(_target.getMaterial().getMatches());
+        }
+        
+        @Override
+        protected Task onTick(AltoClef mod) {
             tryUpdateOpenSmoker(mod);
             // Include both regular + optional items
             ItemTarget materialTarget = _allMaterials;
@@ -336,8 +343,10 @@ public class SmeltInSmokerTask extends ResourceTask {
         @Override
         protected double getCostToMakeNew(AltoClef mod) {
             if (_smokerCache.burnPercentage > 0 || _smokerCache.burningFuelCount > 0 ||
-                    _smokerCache.fuelSlot != null || _smokerCache.materialSlot != null ||
-                    _smokerCache.outputSlot != null) {
+                _smokerCache.fuelSlot != null || _smokerCache.materialSlot != null ||
+                _smokerCache.outputSlot != null ||
+                !_smokerCache.fuelSlot.isEmpty() || !_smokerCache.materialSlot.isEmpty() ||
+                !_smokerCache.outputSlot.isEmpty()) {
                 return 9999999.0;
             }
             if (mod.getItemStorage().getItemCount(Items.COBBLESTONE) > 8 &&

@@ -23,6 +23,7 @@ import java.util.*;
  * Helper functions and definitions for useful groupings of items
  */
 public class ItemHelper {
+	public static final Block[] ORES = new Block[]{Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.LAPIS_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, };
     public static final Item[] COPPER_BLOCKS = new Item[]{Items.COPPER_BLOCK, Items.EXPOSED_COPPER,
             Items.WEATHERED_COPPER, Items.OXIDIZED_COPPER, Items.CUT_COPPER, Items.EXPOSED_CUT_COPPER,
             Items.WEATHERED_CUT_COPPER, Items.OXIDIZED_CUT_COPPER, Items.WAXED_COPPER_BLOCK,
@@ -133,6 +134,24 @@ public class ItemHelper {
             Blocks.SPRUCE_HANGING_SIGN, Blocks.SPRUCE_WALL_HANGING_SIGN, Blocks.MANGROVE_HANGING_SIGN,
             Blocks.MANGROVE_WALL_HANGING_SIGN, Blocks.BAMBOO_HANGING_SIGN, Blocks.BAMBOO_WALL_HANGING_SIGN,
             Blocks.CHERRY_HANGING_SIGN, Blocks.CHERRY_WALL_HANGING_SIGN};
+    private static final Map<Item, Item> _oreToDrop = new HashMap<>() {
+    	{
+    		put(Items.COAL_ORE, Items.COAL);
+    		put(Items.DEEPSLATE_COAL_ORE, Items.COAL);
+    		put(Items.COPPER_ORE, Items.COPPER_INGOT);
+    		put(Items.DEEPSLATE_COPPER_ORE, Items.COPPER_INGOT);
+    		put(Items.IRON_ORE, Items.IRON_INGOT);
+    		put(Items.DEEPSLATE_IRON_ORE, Items.IRON_INGOT);
+    		put(Items.LAPIS_ORE, Items.LAPIS_LAZULI);
+    		put(Items.DEEPSLATE_LAPIS_ORE, Items.LAPIS_LAZULI);
+    		put(Items.GOLD_ORE, Items.GOLD_INGOT);
+    		put(Items.DEEPSLATE_GOLD_ORE, Items.GOLD_INGOT);
+    		put(Items.DIAMOND_ORE, Items.DIAMOND);
+    		put(Items.DEEPSLATE_DIAMOND_ORE, Items.DIAMOND);
+    		put(Items.REDSTONE_ORE, Items.REDSTONE);
+    		put(Items.DEEPSLATE_REDSTONE_ORE, Items.REDSTONE);
+    	}
+    };
     private static final Map<Item, Item> _logToPlanks = new HashMap<>() {
         {
             put(Items.CHERRY_LOG, Items.CHERRY_PLANKS);
@@ -324,6 +343,10 @@ public class ItemHelper {
             }
         }
         return result.toArray(Block[]::new);
+    }
+    
+    public static Item oreToDrop(Item ore) {
+    	return _oreToDrop.getOrDefault(ore, null);
     }
 
     public static Item logToPlanks(Item logItem) {
@@ -528,5 +551,4 @@ public class ItemHelper {
             return planks == Items.CRIMSON_PLANKS || planks == Items.WARPED_PLANKS;
         }
     }
-
 }

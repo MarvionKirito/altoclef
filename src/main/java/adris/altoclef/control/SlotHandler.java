@@ -52,6 +52,9 @@ public class SlotHandler {
 
     public void clickSlot(Slot slot, int mouseButton, SlotActionType type) {
         if (!canDoSlotAction()) return;
+        if(!_mod.getClientBaritone().getPathingBehavior().isSafeToCancel()) return;
+        _mod.getClientBaritone().getPathingBehavior().requestPause();
+        if(_mod.getClientBaritone().getPathingBehavior().isPathing()) return;
 
         if (slot.getWindowSlot() == -1) {
             clickSlot(PlayerSlot.UNDEFINED, 0, SlotActionType.PICKUP);
@@ -63,7 +66,7 @@ public class SlotHandler {
         clickWindowSlot(slot.getWindowSlot(), mouseButton, type);
     }
 
-    private void clickSlotForce(Slot slot, int mouseButton, SlotActionType type) {
+    public void clickSlotForce(Slot slot, int mouseButton, SlotActionType type) {
         forceAllowNextSlotAction();
         clickSlot(slot, mouseButton, type);
     }
