@@ -60,7 +60,7 @@ public class AltoClef implements ModInitializer {
     // Static access to altoclef
     private static final Queue<Consumer<AltoClef>> _postInitQueue = new ArrayDeque<>();
 
-    public static MinecraftClient mc;
+    public static MinecraftClient mcClient;
     // Central Managers
     private static CommandExecutor _commandExecutor;
     private TaskRunner _taskRunner;
@@ -116,7 +116,7 @@ public class AltoClef implements ModInitializer {
 
         initializeBaritoneSettings();
         
-        mc = MinecraftClient.getInstance();
+        mcClient = MinecraftClient.getInstance();
 
         // Central Managers
         _commandExecutor = new CommandExecutor(this);

@@ -95,7 +95,7 @@ public class CraftInInventoryTask extends ResourceTask {
             return collectRecipeSubTask(mod);
         }
         
-        if(mod.getModSettings().shouldOpenInvDuringCrafting() && client != null && (client.currentScreen == null || !client.currentScreen.equals(invScreen))) client.setScreen(invScreen);
+        if(mod.getModSettings().shouldOpenInventoryDuringCrafting() && client != null && (client.currentScreen == null || !client.currentScreen.equals(invScreen))) client.setScreen(invScreen);
 
         // No need to free inventory, output gets picked up.
 
@@ -107,7 +107,7 @@ public class CraftInInventoryTask extends ResourceTask {
 
     @Override
     protected void onResourceStop(AltoClef mod, Task interruptTask) {
-    	if(mod.getModSettings().shouldOpenInvDuringCrafting() && (client != null && client.currentScreen != null && client.currentScreen.equals(invScreen))) {
+    	if(mod.getModSettings().shouldOpenInventoryDuringCrafting() && (client != null && client.currentScreen != null && client.currentScreen.equals(invScreen))) {
     		StorageHelper.closeScreen();
     		client.setScreen(null);
     	}

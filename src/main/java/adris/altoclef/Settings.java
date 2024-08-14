@@ -83,7 +83,7 @@ public class Settings implements IFailableConfigFile {
     /*
      * If true open inventory during crafting in 2x2
      */
-    private boolean openInvDuringCrafting = true;
+    private boolean openInventoryDuringCrafting = true;
 
     /**
      * The delay between moving items for crafting/furnace/any kind of inventory movement.
@@ -478,8 +478,8 @@ public class Settings implements IFailableConfigFile {
     	return spreadItemsToCraft;
     }
     
-	public boolean shouldOpenInvDuringCrafting() {
-		return openInvDuringCrafting;
+	public boolean shouldOpenInventoryDuringCrafting() {
+		return openInventoryDuringCrafting;
 	}
 
     public float getResourcePickupRange() {

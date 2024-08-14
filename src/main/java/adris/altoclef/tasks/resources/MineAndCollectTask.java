@@ -58,8 +58,6 @@ public class MineAndCollectTask extends ResourceTask
 
 	private final MineOrCollectTask _subtask;
 
-	private boolean _wasWarnned = false;
-
 	public MineAndCollectTask(ItemTarget[] itemTargets, Block[] blocksToMine, MiningRequirement requirement)
 	{
 		super(itemTargets);
@@ -105,15 +103,6 @@ public class MineAndCollectTask extends ResourceTask
 	@Override
 	protected void onResourceStart(AltoClef mod)
 	{
-
-		if (mod.getClientBaritoneSettings().legitMine.value && !_wasWarnned)
-		{
-			Debug.logWarning("Please make sure that block tracker settings are as follows: " + "\n"
-					+ "scanInterval: 1.0" + "\n" + "scanIntervalWhenNewBlocksFound: 0.3" + "\n"
-					+ "maxTotalCacheSize: 45000" + "\n" + "maxCacheSizePerBlockType: 600" + "\n"
-					+ "Waring: These tracker settings can cause a lot of lag...");
-			_wasWarnned = true;
-		}
 
 		mod.getBehaviour().push();
 		mod.getBlockTracker().trackBlock(_blocksToMine);
@@ -625,11 +614,11 @@ public class MineAndCollectTask extends ResourceTask
 
 		protected static boolean isBlockVisible(BlockPos blockPos)
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
-			Vec3d playerPos = new Vec3d(mc.player.getX(), mc.player.getEyeY(), mc.player.getZ());
+			MinecraftClient mcClient = MinecraftClient.getInstance();
+			Vec3d playerPos = new Vec3d(mcClient.player.getX(), mcClient.player.getEyeY(), mcClient.player.getZ());
 			Vec3d blockPosVec = new Vec3d(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5);
-			HitResult hitResult = mc.world.raycast(new RaycastContext(playerPos, blockPosVec,
-					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player));
+			HitResult hitResult = mcClient.world.raycast(new RaycastContext(playerPos, blockPosVec,
+					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mcClient.player));
 
 			if (hitResult.getType() == HitResult.Type.BLOCK)
 			{
