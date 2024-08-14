@@ -35,9 +35,9 @@ public class BranchMineCommand extends Command {
 	private static final Map<String, Block[]> _dropToOre = new HashMap<>() {
     	{
     		put("coal", new Block[]{Blocks.COAL_ORE, Blocks.DEEPSLATE_COAL_ORE});
-    		put("raw_iron", new Block[]{Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE});
-    		put("raw_gold", new Block[]{Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE});
-    		put("raw_copper", new Block[]{Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE});
+    		put("raw_iron", new Block[]{Blocks.IRON_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.RAW_IRON_BLOCK});
+    		put("raw_gold", new Block[]{Blocks.GOLD_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.RAW_GOLD_BLOCK});
+    		put("raw_copper", new Block[]{Blocks.COPPER_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.RAW_COPPER_BLOCK});
     		put("diamond", new Block[]{Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE});
     		put("emerald", new Block[]{Blocks.EMERALD_ORE, Blocks.DEEPSLATE_EMERALD_ORE});
     		put("redstone", new Block[]{Blocks.REDSTONE_ORE, Blocks.DEEPSLATE_REDSTONE_ORE});
@@ -62,7 +62,7 @@ public class BranchMineCommand extends Command {
     	BranchMiningTask targetTask;
     	List<Block> blocksToMine = new ArrayList<>();
         if (items == null || items.length == 0) {
-            mod.log("You must specify at least one item!");
+            mod.log("At least one item must be specified.");
             finish();
             return;
         }
@@ -76,8 +76,8 @@ public class BranchMineCommand extends Command {
 			}
 			blocksToMine.addAll(Arrays.asList(_dropToOre.get(itemTarget.getCatalogueName())));
 		}
-        OreDistribution currOreDis = new OreDistribution(blocksToMine);
-        BlockPos homePos = new BlockPos(mod.getPlayer().getBlockX(), currOreDis.optimalHeight, mod.getPlayer().getBlockZ());
+        OreDistribution currentTargrtOreDistance = new OreDistribution(blocksToMine);
+        BlockPos homePos = new BlockPos(mod.getPlayer().getBlockX(), currentTargrtOreDistance.optimalHeight, mod.getPlayer().getBlockZ());
         targetTask = new BranchMiningTask(
     		homePos, 
 			mod.getPlayer().getMovementDirection(),
