@@ -162,12 +162,19 @@ public class SmeltInSmokerTask extends ResourceTask {
             return (mod.getPlayer().currentScreenHandler instanceof SmokerScreenHandler);
         }
 
+
         @Override
-        protected Task onTick(AltoClef mod) {
+        protected void onStart(AltoClef mod) {
+            super.onStart(mod);
+
             mod.getBehaviour().addProtectedItems(ItemHelper.PLANKS);
             mod.getBehaviour().addProtectedItems(Items.COAL);
             mod.getBehaviour().addProtectedItems(_allMaterials.getMatches());
             mod.getBehaviour().addProtectedItems(_target.getMaterial().getMatches());
+        }
+        
+        @Override
+        protected Task onTick(AltoClef mod) {
             tryUpdateOpenSmoker(mod);
             // Include both regular + optional items
             ItemTarget materialTarget = _allMaterials;

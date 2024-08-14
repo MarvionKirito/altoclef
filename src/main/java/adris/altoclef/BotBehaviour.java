@@ -260,7 +260,7 @@ public class BotBehaviour {
     class State {
         /// Baritone Params
         public double followOffsetDistance;
-        public List<Item> protectedItems = new ArrayList<>();
+        public HashSet<Item> protectedItems = new HashSet<>();
         public boolean mineScanDroppedItems;
         public boolean swimThroughLava;
         public boolean allowDiagonalAscend;
@@ -343,7 +343,7 @@ public class BotBehaviour {
                     blocksToAvoidBreaking = new HashSet<>(settings.getBlocksToAvoidBreaking());
                     toAvoidBreaking = new ArrayList<>(settings.getBreakAvoiders());
                     toAvoidPlacing = new ArrayList<>(settings.getPlaceAvoiders());
-                    protectedItems = new ArrayList<>(settings.getProtectedItems());
+                    protectedItems = new HashSet<>(settings.getProtectedItems());
                     synchronized (settings.getPropertiesMutex()) {
                         allowWalking = new ArrayList<>(settings.getForceWalkOnPredicates());
                         avoidWalkingThrough = new ArrayList<>(settings.getForceAvoidWalkThroughPredicates());

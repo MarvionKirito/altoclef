@@ -35,16 +35,6 @@ public class CollectRecipeCataloguedResourcesTask extends Task {
     @Override
     protected Task onTick(AltoClef mod) {
         // TODO: Cache this once instead of doing it every frame.
-    	
-    	if(MinecraftClient.getInstance().getCurrentFps() <= 3 
-    			)
-    	{
-    		Debug.logWarning("Saving performance!!\n\n[WARNING] This is a DUCT TAPE!!\n[WARNING] Batter solution should be found!!\n\n");
-    		mod.getClientBaritoneSettings().costHeuristic.value = 600.0;
-    		return null;
-//    		if(mod.getClientBaritone().getPathingBehavior().isSafeToCancel())
-//    			mod.getClientBaritone().getPathingBehavior().requestPause();
-    	}
 
         // Stuff to get, both catalogued + individual items.
         HashMap<String, Integer> catalogueCount = new HashMap<>();

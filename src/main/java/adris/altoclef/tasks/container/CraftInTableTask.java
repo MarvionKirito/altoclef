@@ -245,6 +245,9 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
 
         // Reset the collect task
         _collectTask.reset();
+        
+        // Add protected items to the behaviour
+        mod.getBehaviour().addProtectedItems(getMaterialsArray());
     }
 
     /**
@@ -299,8 +302,6 @@ class DoCraftInTableTask extends DoStuffInContainerTask {
      */
     @Override
     protected Task onTick(AltoClef mod) {
-        // Add protected items to the behaviour
-        mod.getBehaviour().addProtectedItems(getMaterialsArray());
 
         // Avoid breaking crafting tables
         if (mod.getBlockTracker().isTracking(Blocks.CRAFTING_TABLE)) {
