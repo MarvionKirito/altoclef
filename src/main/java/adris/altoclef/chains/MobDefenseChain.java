@@ -401,12 +401,7 @@ public class MobDefenseChain extends SingleTaskChain {
                         // Ghast ball
                         shouldForce = true;
                     } else if (entity instanceof PlayerEntity player && mod.getBehaviour().shouldForceFieldPlayers()) {
-                        if (!player.equals(mod.getPlayer())) {
-                            String name = player.getName().getString();
-                            if (!mod.getButler().isUserAuthorized(name)) {
-                                shouldForce = true;
-                            }
-                        }
+                        shouldForce = true;
                     }
                     if (shouldForce) {
                         applyForceField(entity);

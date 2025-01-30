@@ -76,7 +76,7 @@ public class KillAura {
         if (entities.isPresent() && mod.getPlayer().getHealth() >= 10 &&
                 !mod.getEntityTracker().entityFound(PotionEntity.class) && !mod.getFoodChain().needsToEat() &&
                 (Double.isInfinite(_forceFieldRange) || entities.get().squaredDistanceTo(mod.getPlayer()) < _forceFieldRange * _forceFieldRange ||
-                        entities.get().squaredDistanceTo(mod.getPlayer()) < 40) &&
+                        entities.get().squaredDistanceTo(mod.getPlayer()) <= 3.1) &&
                 !mod.getMLGBucketChain().isFallingOhNo(mod) && mod.getMLGBucketChain().doneMLG() &&
                 !mod.getMLGBucketChain().isChorusFruiting()) {
             PlayerSlot offhandSlot = PlayerSlot.OFFHAND_SLOT;
@@ -174,6 +174,7 @@ public class KillAura {
 
     private void attack(AltoClef mod, Entity entity, boolean equipSword) {
         if (entity == null) return;
+        if (_shielding) return;
         if (!(entity instanceof FireballEntity)) {
             LookHelper.lookAt(mod, entity.getEyePos());
         }

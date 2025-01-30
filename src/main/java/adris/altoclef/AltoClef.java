@@ -2,6 +2,9 @@ package adris.altoclef;
 
 import adris.altoclef.butler.Butler;
 import adris.altoclef.chains.*;
+import adris.altoclef.cheatmenu.*;
+import adris.altoclef.cheatmenu.UI.screens.clickgui.ClickGUI;
+import adris.altoclef.cheatmenu.managers.ModuleManager;
 import adris.altoclef.commandsystem.CommandExecutor;
 import adris.altoclef.control.InputControls;
 import adris.altoclef.control.PlayerExtraController;
@@ -41,10 +44,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.Consumer;
 
+import static baritone.api.utils.Helper.mc;
+
 /**
  * Central access point for AltoClef
  */
 public class AltoClef implements ModInitializer {
+
+    public static final AltoClef INSTANCE = new AltoClef();
 
     // Static access to altoclef
     private static final Queue<Consumer<AltoClef>> _postInitQueue = new ArrayDeque<>();
@@ -77,6 +84,8 @@ public class AltoClef implements ModInitializer {
     private SlotHandler _slotHandler;
     // Butler
     private Butler _butler;
+    protected static MinecraftClient mc = MinecraftClient.getInstance();
+
 
     // Are we in game (playing in a server/world)
     public static boolean inGame() {
@@ -488,4 +497,28 @@ public class AltoClef implements ModInitializer {
         }
     }
 
+    // Cheat Menu Stuff
+
+/*    public void onKeypress(int key, int action) {
+        if (action == GLFW.GLFW_PRESS) {
+            for (Mod module : ModuleManager.INSTANCE.getModules()) {
+                if (key == module.getKey()) module.toggle();
+            }
+            if (key == GLFW.GLFW_KEY_INSERT) mc.setScreen(ClickGUI.INSTANCE);
+        }
+    }*/
+
+    public void openClickGUI() {
+        assert mc.currentScreen != null;
+        mc.currentScreen.close();
+        mc.setScreen(ClickGUI.INSTANCE);
+    }
+
+    public void onTick() {
+        if (mc.player != null) {
+            for (Mod module : ModuleManager.INSTANCE.getEnabledModules()) {
+                module.onShitTick();
+            }
+        }
+    }
 }

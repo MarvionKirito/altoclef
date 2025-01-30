@@ -1,0 +1,17 @@
+Experimental AI Task System
+
+Currently Done:
+- Utils (1%)
+- RewardSystem (1%)
+- Tasks (1%)
+
+Current Things to Add:
+- Save AI Data to File to continue Learning every Session
+- AI Debugger (Output information about the AI e.g Stats, Values, Task History and AI Current Thoughts)
+- Dynamic Task System
+- Add something to fallback onto if the AI is stuck / Broken so that it can hopefully save itself enough to rerun the AI Task
+- Discord Webhook Support (Send Notification is Bot is Potentially Stuck)
+- Send Tasks to AI over Discord
+- Send Screenshot to Discord Webhook
+- Send Inventory Screenshot to Discord Webhook
+- Send AI Debugger Output to Discord Webhook

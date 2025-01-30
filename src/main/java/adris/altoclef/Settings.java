@@ -1,6 +1,7 @@
 package adris.altoclef;
 
 import adris.altoclef.control.KillAura;
+import adris.altoclef.experimental.AI.Core.RewardSystem.Tracker;
 import adris.altoclef.tasks.movement.DefaultGoToDimensionTask;
 import adris.altoclef.util.BlockRange;
 import adris.altoclef.util.helpers.ConfigHelper;
@@ -427,6 +428,7 @@ public class Settings implements IFailableConfigFile {
      */
     private List<BlockRange> areasToProtect = Collections.emptyList();
 
+    private int score = 0;
 
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////** END SETTINGS w/ COMMENTS **////////////////////////////////////////////////////
