@@ -71,3 +71,17 @@ is untested and not affiliated with altoclef, use at your own risk!)
 ## [TODO's/Future Features](todos.md)
 
 ## [Development Guide](develop.md)
+
+
+
+## ✨ Feature Request: Allow Nether Portal Casting as a Standalone Utility
+
+Hi, first of all, thank you for your awesome work on AltoClef!
+
+I would like to suggest a small but useful feature. I'd love to be able to use the Nether portal casting functionality as a standalone action, without relying on the full speedrun sequence.
+
+In many cases, I don't use AltoClef's complete speedrun logic, since each speedrunner has their own strategy and preferred techniques. However, AltoClef still provides many convenient and time-saving utilities — one of the best examples is how it handles Nether portal casting. It really helps me quickly and reliably build a portal using lava pools.
+
+So what I'm hoping for is a way to trigger the portal casting manually, such as through a command or hotkey, when I'm near a lava lake and have a water bucket in my inventory. That way, I can use just this specific feature during my own speedruns or casual play, without running the full automation pipeline.
+
+Thanks again for the great work, and I’d love to hear your thoughts on this!
